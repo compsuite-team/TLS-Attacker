@@ -33,6 +33,7 @@ public class StarttlsMessageFactory {
     }
 
     public String createCommand(CommandType commandType, String tag) {
+        // TODO: How to handle empty capabilities?
         String IMAPTag = tag;
         if (!"".equals(IMAPTag))
             IMAPTag = IMAPTag + " ";
@@ -99,10 +100,12 @@ public class StarttlsMessageFactory {
                         List<ServerCapability> capabilities = config.getDefaultServerCapabilities();
                         StringBuilder builder = new StringBuilder();
                         builder.append("250-mail.example.org");
-                        for (int i = 0; i < capabilities.size() - 1; i++) {
-                            builder.append("250-" + capabilities.get(i));
+                        if (!capabilities.isEmpty()) {
+                            for (int i = 0; i < capabilities.size() - 1; i++) {
+                                builder.append("250-" + capabilities.get(i));
+                            }
+                            builder.append("250 " + capabilities.get(capabilities.size() - 1));
                         }
-                        builder.append("250 " + capabilities.get(capabilities.size() - 1));
                         return builder.toString();
                     case C_STARTTLS:
                         return "STARTTLS";

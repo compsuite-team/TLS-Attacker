@@ -1183,7 +1183,7 @@ public class Config implements Serializable {
     /**
      * E-mail Server's protocol-specific capabilities.
      */
-    private List<ServerCapability> defaultServerCapabilities;
+    private List<ServerCapability> defaultServerCapabilities = new LinkedList<ServerCapability>();
 
     private boolean IMAPPreauth = false;
 
