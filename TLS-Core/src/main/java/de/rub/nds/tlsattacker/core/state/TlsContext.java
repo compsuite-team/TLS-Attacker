@@ -653,6 +653,14 @@ public class TlsContext {
 
     private List<ExtensionType> esniExtensions;
 
+    private List<ServerCapability> serverCapabilities;
+
+    private String recentIMAPTag;
+
+    private boolean isPreauth;
+
+    private boolean capaInGreeting;
+
     public TlsContext() {
         this(Config.createConfig());
         httpContext = new HttpContext();
@@ -2462,5 +2470,37 @@ public class TlsContext {
 
     public void setEcCertificateSignatureCurve(NamedGroup ecCertificateSignatureCurve) {
         this.ecCertificateSignatureCurve = ecCertificateSignatureCurve;
+    }
+
+    public void setServerCapabilities(List<ServerCapability> serverCapabilities) {
+        this.serverCapabilities = serverCapabilities;
+    }
+
+    public List<ServerCapability> getServerCapabilities() {
+        return serverCapabilities;
+    }
+
+    public String getRecentIMAPTag() {
+        return recentIMAPTag;
+    }
+
+    public void setRecentIMAPTag(String tag) {
+        this.recentIMAPTag = tag;
+    }
+
+    public boolean isPreauth() {
+        return isPreauth;
+    }
+
+    public void setIsPreauth(boolean isPreauth) {
+        this.isPreauth = isPreauth;
+    }
+
+    public boolean isCapaInGreeting() {
+        return capaInGreeting;
+    }
+
+    public void setCapaInGreeting(boolean capaInGreeting) {
+        this.capaInGreeting = capaInGreeting;
     }
 }

@@ -15,39 +15,7 @@ import de.rub.nds.modifiablevariable.util.UnformattedByteArrayAdapter;
 import de.rub.nds.tlsattacker.core.certificate.CertificateKeyPair;
 import de.rub.nds.tlsattacker.core.connection.InboundConnection;
 import de.rub.nds.tlsattacker.core.connection.OutboundConnection;
-import de.rub.nds.tlsattacker.core.constants.AlertDescription;
-import de.rub.nds.tlsattacker.core.constants.AlertLevel;
-import de.rub.nds.tlsattacker.core.constants.AuthzDataFormat;
-import de.rub.nds.tlsattacker.core.constants.CertificateKeyType;
-import de.rub.nds.tlsattacker.core.constants.CertificateStatusRequestType;
-import de.rub.nds.tlsattacker.core.constants.CertificateType;
-import de.rub.nds.tlsattacker.core.constants.ChooserType;
-import de.rub.nds.tlsattacker.core.constants.CipherSuite;
-import de.rub.nds.tlsattacker.core.constants.ClientAuthenticationType;
-import de.rub.nds.tlsattacker.core.constants.ClientCertificateType;
-import de.rub.nds.tlsattacker.core.constants.CompressionMethod;
-import de.rub.nds.tlsattacker.core.constants.ECPointFormat;
-import de.rub.nds.tlsattacker.core.constants.EsniDnsKeyRecordVersion;
-import de.rub.nds.tlsattacker.core.constants.EsniVersion;
-import de.rub.nds.tlsattacker.core.constants.ExtensionType;
-import de.rub.nds.tlsattacker.core.constants.GOSTCurve;
-import de.rub.nds.tlsattacker.core.constants.HashAlgorithm;
-import de.rub.nds.tlsattacker.core.constants.HeartbeatMode;
-import de.rub.nds.tlsattacker.core.constants.MaxFragmentLength;
-import de.rub.nds.tlsattacker.core.constants.NameType;
-import de.rub.nds.tlsattacker.core.constants.NamedGroup;
-import de.rub.nds.tlsattacker.core.constants.PRFAlgorithm;
-import de.rub.nds.tlsattacker.core.constants.ProtocolVersion;
-import de.rub.nds.tlsattacker.core.constants.PskKeyExchangeMode;
-import de.rub.nds.tlsattacker.core.constants.RunningModeType;
-import de.rub.nds.tlsattacker.core.constants.SSL2CipherSuite;
-import de.rub.nds.tlsattacker.core.constants.SignatureAndHashAlgorithm;
-import de.rub.nds.tlsattacker.core.constants.SrtpProtectionProfiles;
-import de.rub.nds.tlsattacker.core.constants.StarttlsType;
-import de.rub.nds.tlsattacker.core.constants.TokenBindingKeyParameters;
-import de.rub.nds.tlsattacker.core.constants.TokenBindingType;
-import de.rub.nds.tlsattacker.core.constants.TokenBindingVersion;
-import de.rub.nds.tlsattacker.core.constants.UserMappingExtensionHintType;
+import de.rub.nds.tlsattacker.core.constants.*;
 import de.rub.nds.tlsattacker.core.crypto.ec.CurveFactory;
 import de.rub.nds.tlsattacker.core.crypto.ec.EllipticCurve;
 import de.rub.nds.tlsattacker.core.crypto.ec.Point;
@@ -1211,6 +1179,15 @@ public class Config implements Serializable {
     private boolean writeKeylogFile = false;
 
     private String keylogFilePath = null;
+
+    /**
+     * E-mail Server's protocol-specific capabilities.
+     */
+    private List<ServerCapability> defaultServerCapabilities;
+
+    private boolean IMAPPreauth = false;
+
+    private boolean IMAPCapaInGreeting = false;
 
     Config() {
         defaultClientConnection = new OutboundConnection("client", 443, "localhost");
@@ -3673,6 +3650,30 @@ public class Config implements Serializable {
 
     public void setDefaultClientKeyStoreEntries(List<KeyShareStoreEntry> defaultClientKeyStoreEntries) {
         this.defaultClientKeyStoreEntries = defaultClientKeyStoreEntries;
+    }
+
+    public void setDefaultServerCapabilities(List<ServerCapability> defaultServerCapabilities) {
+        this.defaultServerCapabilities = defaultServerCapabilities;
+    }
+
+    public List<ServerCapability> getDefaultServerCapabilities() {
+        return defaultServerCapabilities;
+    }
+
+    public void setIMAPPreauth(boolean IMAPPreauth) {
+        this.IMAPPreauth = IMAPPreauth;
+    }
+
+    public boolean getIMAPPreAuth() {
+        return IMAPPreauth;
+    }
+
+    public void setIMAPCapaInGreeting(boolean IMAPCapaInGreeting) {
+        this.IMAPCapaInGreeting = IMAPCapaInGreeting;
+    }
+
+    public boolean getIMAPCapaInGreeting() {
+        return IMAPCapaInGreeting;
     }
 
     public List<ActionOption> getMessageFactoryActionOptions() {
