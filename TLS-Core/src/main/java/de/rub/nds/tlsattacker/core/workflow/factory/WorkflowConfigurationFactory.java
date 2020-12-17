@@ -27,34 +27,7 @@ import de.rub.nds.tlsattacker.core.protocol.message.extension.ExtensionMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.extension.PreSharedKeyExtensionMessage;
 import de.rub.nds.tlsattacker.core.record.BlobRecord;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
-import de.rub.nds.tlsattacker.core.workflow.action.BufferedGenericReceiveAction;
-import de.rub.nds.tlsattacker.core.workflow.action.BufferedSendAction;
-import de.rub.nds.tlsattacker.core.workflow.action.ClearBuffersAction;
-import de.rub.nds.tlsattacker.core.workflow.action.CopyBuffersAction;
-import de.rub.nds.tlsattacker.core.workflow.action.CopyPreMasterSecretAction;
-import de.rub.nds.tlsattacker.core.workflow.action.EsniKeyDnsRequestAction;
-import de.rub.nds.tlsattacker.core.workflow.action.FlushSessionCacheAction;
-import de.rub.nds.tlsattacker.core.workflow.action.ForwardMessagesAction;
-import de.rub.nds.tlsattacker.core.workflow.action.ForwardRecordsAction;
-import de.rub.nds.tlsattacker.core.workflow.action.MessageAction;
-import de.rub.nds.tlsattacker.core.workflow.action.MessageActionFactory;
-import de.rub.nds.tlsattacker.core.workflow.action.PopAndSendAction;
-import de.rub.nds.tlsattacker.core.workflow.action.PopBufferedMessageAction;
-import de.rub.nds.tlsattacker.core.workflow.action.PopBufferedRecordAction;
-import de.rub.nds.tlsattacker.core.workflow.action.PopBuffersAction;
-import de.rub.nds.tlsattacker.core.workflow.action.PrintLastHandledApplicationDataAction;
-import de.rub.nds.tlsattacker.core.workflow.action.PrintSecretsAction;
-import de.rub.nds.tlsattacker.core.workflow.action.ReceiveAction;
-import de.rub.nds.tlsattacker.core.workflow.action.ReceiveTillAction;
-import de.rub.nds.tlsattacker.core.workflow.action.RemBufferedChCiphersAction;
-import de.rub.nds.tlsattacker.core.workflow.action.RemBufferedChExtensionsAction;
-import de.rub.nds.tlsattacker.core.workflow.action.RenegotiationAction;
-import de.rub.nds.tlsattacker.core.workflow.action.ResetConnectionAction;
-import de.rub.nds.tlsattacker.core.workflow.action.SendAction;
-import de.rub.nds.tlsattacker.core.workflow.action.SendDynamicClientKeyExchangeAction;
-import de.rub.nds.tlsattacker.core.workflow.action.SendDynamicServerCertificateAction;
-import de.rub.nds.tlsattacker.core.workflow.action.SendDynamicServerKeyExchangeAction;
-import de.rub.nds.tlsattacker.core.workflow.action.TlsAction;
+import de.rub.nds.tlsattacker.core.workflow.action.*;
 import de.rub.nds.tlsattacker.transport.ConnectionEndType;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -809,45 +782,46 @@ public class WorkflowConfigurationFactory {
     }
 
     public WorkflowTrace addStartTlsActions(AliasedConnection connection, StarttlsType type, WorkflowTrace workflowTrace) {
+        StarttlsMessageFactory factory;
         switch (type) {
-            case FTP: {
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        StarttlsMessage.FTP_S_CONNECTED.getStarttlsMessage(), "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.CLIENT,
-                        StarttlsMessage.FTP_TLS.getStarttlsMessage(), "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        StarttlsMessage.FTP_S_READY.getStarttlsMessage(), "US-ASCII"));
-                return workflowTrace;
-            }
+        // TODO: Implement for FTP
             case IMAP: {
+                // TODO: IMAPTAG überarbeiten
+                factory = new StarttlsMessageFactory(config);
+                workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection,
+                        ConnectionEndType.SERVER, new ServerGreetingMessage(config)));
+                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
+                        ConnectionEndType.CLIENT, factory.createCommand(StarttlsMessageFactory.CommandType.C_STARTTLS),
+                        StarttlsType.IMAP, "US-ASCII"));
                 workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        StarttlsMessage.IMAP_S_CONNECTED.getStarttlsMessage(), "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.CLIENT,
-                        StarttlsMessage.IMAP_TLS.getStarttlsMessage(), "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        StarttlsMessage.IMAP_S_READY.getStarttlsMessage(), "US-ASCII"));
+                        factory.createCommand(StarttlsMessageFactory.CommandType.S_STARTTLS), "US-ASCII"));
                 return workflowTrace;
             }
             case POP3: {
+                factory = new StarttlsMessageFactory(config);
+                workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection,
+                        ConnectionEndType.SERVER, new ServerGreetingMessage(config)));
+                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
+                        ConnectionEndType.CLIENT, factory.createCommand(StarttlsMessageFactory.CommandType.C_STARTTLS),
+                        StarttlsType.POP3, "US-ASCII"));
                 workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        StarttlsMessage.POP3_S_CONNECTED.getStarttlsMessage(), "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.CLIENT,
-                        StarttlsMessage.POP3_TLS.getStarttlsMessage(), "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        StarttlsMessage.POP3_S_READY.getStarttlsMessage(), "US-ASCII"));
+                        factory.createCommand(StarttlsMessageFactory.CommandType.S_STARTTLS), "US-ASCII"));
                 return workflowTrace;
             }
             case SMTP: {
+                factory = new StarttlsMessageFactory(config);
+                workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection,
+                        ConnectionEndType.SERVER, new ServerGreetingMessage(config)));
+                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
+                        ConnectionEndType.CLIENT, factory.createCommand(StarttlsMessageFactory.CommandType.C_CAPA),
+                        StarttlsType.SMTP, "US-ASCII"));
                 workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        StarttlsMessage.SMTP_S_CONNECTED.getStarttlsMessage(), "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.CLIENT,
-                        StarttlsMessage.SMTP_C_CONNECTED.getStarttlsMessage(), "US-ASCII"));
+                        factory.createCommand(StarttlsMessageFactory.CommandType.S_CAPA), "US-ASCII"));
+                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
+                        ConnectionEndType.CLIENT, factory.createCommand(StarttlsMessageFactory.CommandType.C_STARTTLS),
+                        StarttlsType.SMTP, "US-ASCII"));
                 workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        StarttlsMessage.SMTP_S_OK.getStarttlsMessage(), "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.CLIENT,
-                        StarttlsMessage.SMTP_TLS.getStarttlsMessage(), "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        StarttlsMessage.SMTP_S_READY.getStarttlsMessage(), "US-ASCII"));
+                        factory.createCommand(StarttlsMessageFactory.CommandType.S_STARTTLS), "US-ASCII"));
                 return workflowTrace;
             }
         }

@@ -9,8 +9,10 @@
  */
 package de.rub.nds.tlsattacker.core.workflow.action;
 
+import com.google.common.base.Ascii;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.AliasedConnection;
+import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.protocol.message.ProtocolMessage;
 import de.rub.nds.tlsattacker.core.workflow.action.executor.ActionOption;
 import de.rub.nds.tlsattacker.transport.ConnectionEndType;
@@ -47,6 +49,17 @@ public class MessageActionFactory {
             action = new SendAsciiAction(message, encoding);
         } else {
             action = new GenericReceiveAsciiAction(encoding);
+        }
+        return action;
+    }
+
+    public static AsciiAction createStarttlsCommunicationAction(Config tlsConfig, AliasedConnection connection,
+            ConnectionEndType sendingConnectionEnd, String message, StarttlsType type, String encoding) {
+        AsciiAction action;
+        if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
+            action = new SendAsciiAction(message, encoding);
+        } else {
+            action = new ReceiveStarttlsAction(tlsConfig, message, type, encoding);
         }
         return action;
     }
