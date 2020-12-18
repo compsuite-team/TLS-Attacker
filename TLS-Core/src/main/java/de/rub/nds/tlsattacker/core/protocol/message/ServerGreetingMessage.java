@@ -30,13 +30,8 @@ public class ServerGreetingMessage extends EmailProtocolMessage {
     }
 
     @Override
-    public String toString() {
-        return null;
-    }
-
-    @Override
     public String toCompactString() {
-        return null;
+        return "ServerGreetingMessage";
     }
 
     @Override

@@ -12,6 +12,7 @@ package de.rub.nds.tlsattacker.core.protocol.message;
 import de.rub.nds.modifiablevariable.ModifiableVariableFactory;
 import de.rub.nds.modifiablevariable.ModifiableVariableProperty;
 import de.rub.nds.modifiablevariable.bytearray.ModifiableByteArray;
+import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.core.protocol.handler.ProtocolMessageHandler;
 import de.rub.nds.tlsattacker.core.protocol.message.ProtocolMessage;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
@@ -38,8 +39,11 @@ public abstract class EmailProtocolMessage extends ProtocolMessage {
     }
 
     @Override
-    public String toCompactString() {
-        return null;
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(toCompactString() + ":");
+        sb.append(ArrayConverter.bytesToHexString(getMessage()));
+        return sb.toString();
     }
 
 }

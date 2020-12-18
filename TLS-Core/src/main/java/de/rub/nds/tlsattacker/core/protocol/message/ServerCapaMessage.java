@@ -49,7 +49,7 @@ public class ServerCapaMessage extends EmailProtocolMessage {
 
     @Override
     public String toCompactString() {
-        return null;
+        return "Server Capabilities";
     }
 
     @Override
