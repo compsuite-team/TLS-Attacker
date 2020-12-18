@@ -109,6 +109,7 @@ public class ConnectivityChecker {
         }
     }
 
+    // Test
     public boolean speaksStartTls(Config config) {
         WorkflowConfigurationFactory factory = new WorkflowConfigurationFactory(config);
         WorkflowTrace trace = factory.createTlsEntryWorkflowtrace(config.getDefaultClientConnection());
@@ -117,7 +118,7 @@ public class ConnectivityChecker {
         executor.executeWorkflow();
         if (trace.allActionsExecuted()) {
             for (TlsAction action : trace.getTlsActions()) {
-                if (action instanceof AsciiAction || !(action instanceof SendAsciiAction)) {
+                if (action instanceof AsciiAction) {
                     AsciiAction asciiAction = (AsciiAction) action;
                     if (asciiAction.getAsciiText() != null) {
                         if (asciiAction.getAsciiText().toLowerCase().contains("TLS negotiation".toLowerCase())) {
