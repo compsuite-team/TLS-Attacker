@@ -82,9 +82,6 @@ public class ReceiveStarttlsAction extends AsciiAction {
                     String answer = "";
                     // Answer to specific protocol commands.
                     switch (starttlsType) {
-                    // TODO: Cases zusammenfassen (Switch wird nicht benötigt)
-                    // TODO: Commands aus Factory heraus erstellen.
-                    // TODO: Antworten aus Config hinzufügen.
                         case FTP:
                             break;
                         case IMAP: {
