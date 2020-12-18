@@ -43,7 +43,7 @@ public class ReceiveStarttlsAction extends AsciiAction {
 
     protected List<ProtocolMessage> receivedMessages;
 
-    public ReceiveStarttlsAction(Config config, String expectedMessage, StarttlsType type, String encoding) {
+    public ReceiveStarttlsAction(Config config, String expectedMessage, String encoding) {
         super(encoding);
         this.expectedMessage = expectedMessage;
         this.starttlsType = config.getStarttlsType();
@@ -99,19 +99,19 @@ public class ReceiveStarttlsAction extends AsciiAction {
                         }
                         case POP3: {
                             if (receivedMessage.contains("CAPA"))
-                                answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_CAPA);
+                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CAPA);
                             if (receivedMessage.contains("QUIT"))
-                                answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_BYE);
+                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_BYE);
                             // TODO: Terminate connection.
                             break;
                         }
                         case SMTP: {
                             if (receivedMessage.contains("NOOP"))
-                                answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_OK);
+                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_OK);
                             if (receivedMessage.contains("EHLO") && !"EHLO".equals(expectedMessage))
-                                answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_CAPA);
+                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CAPA);
                             if (receivedMessage.contains("QUIT"))
-                                answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_BYE);
+                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_BYE);
                             // TODO: Terminate connection.
                             break;
                         }

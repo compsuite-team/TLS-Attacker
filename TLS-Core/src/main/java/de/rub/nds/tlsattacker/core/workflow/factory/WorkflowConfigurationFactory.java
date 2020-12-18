@@ -782,46 +782,38 @@ public class WorkflowConfigurationFactory {
     }
 
     public WorkflowTrace addStartTlsActions(AliasedConnection connection, StarttlsType type, WorkflowTrace workflowTrace) {
-        StarttlsMessageFactory factory;
         switch (type) {
         // TODO: Implement for FTP
             case IMAP: {
                 // TODO: IMAPTAG überarbeiten
-                factory = new StarttlsMessageFactory(config);
                 workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection,
                         ConnectionEndType.SERVER, new ServerGreetingMessage(config)));
                 workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
-                        ConnectionEndType.CLIENT, factory.createCommand(StarttlsMessageFactory.CommandType.C_STARTTLS),
-                        StarttlsType.IMAP, "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        factory.createCommand(StarttlsMessageFactory.CommandType.S_STARTTLS), "US-ASCII"));
+                        ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_STARTTLS, "US-ASCII"));
+                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsAsciiAction(config, connection,
+                        ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_STARTTLS, "US-ASCII"));
                 return workflowTrace;
             }
             case POP3: {
-                factory = new StarttlsMessageFactory(config);
                 workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection,
                         ConnectionEndType.SERVER, new ServerGreetingMessage(config)));
                 workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
-                        ConnectionEndType.CLIENT, factory.createCommand(StarttlsMessageFactory.CommandType.C_STARTTLS),
-                        StarttlsType.POP3, "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        factory.createCommand(StarttlsMessageFactory.CommandType.S_STARTTLS), "US-ASCII"));
+                        ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_STARTTLS, "US-ASCII"));
+                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsAsciiAction(config, connection,
+                        ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_STARTTLS, "US-ASCII"));
                 return workflowTrace;
             }
             case SMTP: {
-                factory = new StarttlsMessageFactory(config);
                 workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection,
                         ConnectionEndType.SERVER, new ServerGreetingMessage(config)));
                 workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
-                        ConnectionEndType.CLIENT, factory.createCommand(StarttlsMessageFactory.CommandType.C_CAPA),
-                        StarttlsType.SMTP, "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        factory.createCommand(StarttlsMessageFactory.CommandType.S_CAPA), "US-ASCII"));
+                        ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_CAPA, "US-ASCII"));
+                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsAsciiAction(config, connection,
+                        ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_CAPA, "US-ASCII"));
                 workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
-                        ConnectionEndType.CLIENT, factory.createCommand(StarttlsMessageFactory.CommandType.C_STARTTLS),
-                        StarttlsType.SMTP, "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createAsciiAction(connection, ConnectionEndType.SERVER,
-                        factory.createCommand(StarttlsMessageFactory.CommandType.S_STARTTLS), "US-ASCII"));
+                        ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_STARTTLS, "US-ASCII"));
+                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsAsciiAction(config, connection,
+                        ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_STARTTLS, "US-ASCII"));
                 return workflowTrace;
             }
         }

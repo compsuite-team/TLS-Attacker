@@ -64,11 +64,11 @@ public class ServerGreetingMessagePreparator extends EmailProtocolMessagePrepara
                     break;
                 }
                 case POP3:
-                    stream.write(factory.createCommand(StarttlsMessageFactory.CommandType.S_CONNECTED).getBytes(
+                    stream.write(factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CONNECTED).getBytes(
                             StandardCharsets.UTF_8));
                     break;
                 case SMTP:
-                    stream.write(factory.createCommand(StarttlsMessageFactory.CommandType.S_CONNECTED).getBytes(
+                    stream.write(factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CONNECTED).getBytes(
                             StandardCharsets.UTF_8));
                     break;
             }

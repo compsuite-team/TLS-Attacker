@@ -14,6 +14,7 @@ import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.constants.ServerCapability;
 import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
+import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 
 import java.util.List;
 
@@ -28,7 +29,12 @@ public class StarttlsMessageFactory {
         this.starttlsType = config.getStarttlsType();
     }
 
-    public String createCommand(CommandType commandType) {
+    // TODO:Split createCommand in Send & Receive
+    public String createSendCommand(CommandType commandType) {
+        return createCommand(commandType, "abc");
+    }
+
+    public String createReceiveCommand(CommandType commandType) {
         return createCommand(commandType, "");
     }
 
@@ -49,76 +55,76 @@ public class StarttlsMessageFactory {
                     case C_CAPA:
                         return IMAPTag + "CAPABILITY";
                     case S_CAPA:
-                        return "* " + builder.toString() + "\r\n" + IMAPTag + " OK";
+                        return "* " + builder.toString() + "\r\n" + IMAPTag + " OK\r\n";
                     case C_STARTTLS:
-                        return IMAPTag + "STARTTLS";
+                        return IMAPTag + "STARTTLS\r\n";
                     case S_STARTTLS:
-                        return IMAPTag + "OK let's talk TLS";
+                        return IMAPTag + "OK Begin TLS negotiation\r\n";// "OK let's talk TLS"
                     case S_OK:
-                        return IMAPTag + "OK";
+                        return IMAPTag + "OK\r\n";
                     case C_NOOP:
-                        return IMAPTag + "NOOP";
+                        return IMAPTag + "NOOP\r\n";
                     case C_QUIT:
-                        return IMAPTag + "LOGOUT";
+                        return IMAPTag + "LOGOUT\r\n";
                     case S_BYE:
-                        return "* BYE\r\n" + IMAPTag + "OK";
+                        return "* BYE\r\n" + IMAPTag + "OK\r\n";
                 }
             }
             case POP3: {
                 switch (commandType) {
                     case S_CONNECTED:
-                        return "+OK Bonjour from POP3";
+                        return "+OK Bonjour from POP3\r\n";
                     case C_CAPA:
-                        return "CAPA";
+                        return "CAPA\r\n";
                     case S_CAPA:
                         StringBuilder builder = new StringBuilder();
                         builder.append("+OK");
                         for (ServerCapability capa : config.getDefaultServerCapabilities()) {
                             builder.append("\r\n" + capa.getServerCapability());
                         }
-                        builder.append("\r\n.");
+                        builder.append("\r\n.\r\n");
                         return builder.toString();
                     case C_STARTTLS:
-                        return "STLS";
+                        return "STLS\r\n";
                     case S_STARTTLS:
-                        return "+OK Begin TLS negotiation";
+                        return "+OK Begin TLS negotiation\r\n";
                     case C_QUIT:
-                        return "QUIT";
+                        return "QUIT\r\n";
                     case S_OK:
                     case S_BYE:
-                        return "+OK";
+                        return "+OK\r\n";
                 }
 
             }
             case SMTP: {
                 switch (commandType) {
                     case S_CONNECTED:
-                        return "220 mail.example.com Hello from SMTP";
+                        return "220 mail.example.com Hello from SMTP\r\n";
                     case C_CAPA:
-                        return "EHLO";
+                        return "EHLO\r\n";
                     case S_CAPA:
                         List<ServerCapability> capabilities = config.getDefaultServerCapabilities();
                         StringBuilder builder = new StringBuilder();
-                        builder.append("250-mail.example.org");
+                        builder.append("250-mail.example.org\r\n");
                         if (!capabilities.isEmpty()) {
                             for (int i = 0; i < capabilities.size() - 1; i++) {
-                                builder.append("250-" + capabilities.get(i));
+                                builder.append("250-" + capabilities.get(i) + "\r\n");
                             }
-                            builder.append("250 " + capabilities.get(capabilities.size() - 1));
+                            builder.append("250 " + capabilities.get(capabilities.size() - 1) + "\r\n");
                         }
                         return builder.toString();
                     case C_STARTTLS:
-                        return "STARTTLS";
+                        return "STARTTLS\r\n";
                     case S_STARTTLS:
-                        return "220 Go ahead";
+                        return "220 Go ahead with TLS negotiation\r\n";
                     case C_NOOP:
-                        return "NOOP";
+                        return "NOOP\r\n";
                     case S_OK:
-                        return "250 OK";
+                        return "250 OK\r\n";
                     case C_QUIT:
-                        return "QUIT";
+                        return "QUIT\r\n";
                     case S_BYE:
-                        return "221 OK";
+                        return "221 OK\r\n";
                 }
 
             }

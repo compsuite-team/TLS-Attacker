@@ -53,13 +53,32 @@ public class MessageActionFactory {
         return action;
     }
 
-    public static AsciiAction createStarttlsCommunicationAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, String message, StarttlsType type, String encoding) {
+    public static AsciiAction createStarttlsAsciiAction(Config tlsConfig, AliasedConnection connection,
+            ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
+        StarttlsMessageFactory factory = new StarttlsMessageFactory(tlsConfig);
+        String message;
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
+            message = factory.createSendCommand(commandType);
             action = new SendAsciiAction(message, encoding);
         } else {
-            action = new ReceiveStarttlsAction(tlsConfig, message, type, encoding);
+            message = factory.createReceiveCommand(commandType);
+            action = new GenericReceiveAsciiAction(encoding);
+        }
+        return action;
+    }
+
+    public static AsciiAction createStarttlsCommunicationAction(Config tlsConfig, AliasedConnection connection,
+            ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
+        StarttlsMessageFactory factory = new StarttlsMessageFactory(tlsConfig);
+        AsciiAction action;
+        String message;
+        if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
+            message = factory.createSendCommand(commandType);
+            action = new SendAsciiAction(message, encoding);
+        } else {
+            message = factory.createReceiveCommand(commandType);
+            action = new ReceiveStarttlsAction(tlsConfig, message, encoding);
         }
         return action;
     }
