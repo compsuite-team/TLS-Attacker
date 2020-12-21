@@ -53,7 +53,7 @@ public class StarttlsMessageFactory {
                     case S_CONNECTED:
                         return "* OK [" + builder.toString() + "] Service Ready\r\n";
                     case C_CAPA:
-                        return IMAPTag + "CAPABILITY";
+                        return IMAPTag + "CAPABILITY\r\n";
                     case S_CAPA:
                         return "* " + builder.toString() + "\r\n" + IMAPTag + " OK\r\n";
                     case C_STARTTLS:
@@ -101,7 +101,7 @@ public class StarttlsMessageFactory {
                     case S_CONNECTED:
                         return "220 mail.example.com Hello from SMTP\r\n";
                     case C_CAPA:
-                        return "EHLO\r\n";
+                        return "EHLO mail.exampl.com\r\n";
                     case S_CAPA:
                         List<ServerCapability> capabilities = config.getDefaultServerCapabilities();
                         StringBuilder builder = new StringBuilder();

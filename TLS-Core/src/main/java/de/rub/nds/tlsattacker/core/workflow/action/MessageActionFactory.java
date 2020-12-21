@@ -53,6 +53,20 @@ public class MessageActionFactory {
         return action;
     }
 
+    public static AsciiAction createIssueStarttlsCommandAction(Config tlsConfig, AliasedConnection connection,
+            ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
+        StarttlsMessageFactory factory = new StarttlsMessageFactory(tlsConfig);
+        String message;
+        AsciiAction action;
+        if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
+            message = factory.createSendCommand(commandType);
+            action = new SendStarttlsCommandAction(message, encoding);
+        } else {
+            action = new ReceiveStarttlsCommandAction(encoding);
+        }
+        return action;
+    }
+
     public static AsciiAction createStarttlsAsciiAction(Config tlsConfig, AliasedConnection connection,
             ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
         StarttlsMessageFactory factory = new StarttlsMessageFactory(tlsConfig);

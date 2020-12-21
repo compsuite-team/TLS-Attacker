@@ -20,10 +20,7 @@ import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutor;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowExecutorFactory;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
-import de.rub.nds.tlsattacker.core.workflow.action.AsciiAction;
-import de.rub.nds.tlsattacker.core.workflow.action.ReceiveTillAction;
-import de.rub.nds.tlsattacker.core.workflow.action.SendAsciiAction;
-import de.rub.nds.tlsattacker.core.workflow.action.TlsAction;
+import de.rub.nds.tlsattacker.core.workflow.action.*;
 import de.rub.nds.tlsattacker.core.workflow.action.executor.WorkflowExecutorType;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowConfigurationFactory;
 import de.rub.nds.tlsattacker.core.workflow.factory.WorkflowTraceType;
@@ -109,7 +106,7 @@ public class ConnectivityChecker {
         }
     }
 
-    // Test
+    // Test TODO: 220 (SMTP),
     public boolean speaksStartTls(Config config) {
         WorkflowConfigurationFactory factory = new WorkflowConfigurationFactory(config);
         WorkflowTrace trace = factory.createTlsEntryWorkflowtrace(config.getDefaultClientConnection());
@@ -118,10 +115,12 @@ public class ConnectivityChecker {
         executor.executeWorkflow();
         if (trace.allActionsExecuted()) {
             for (TlsAction action : trace.getTlsActions()) {
-                if (action instanceof AsciiAction) {
+                if (action instanceof ReceiveStarttlsCommandAction || action instanceof SendStarttlsCommandAction) {
                     AsciiAction asciiAction = (AsciiAction) action;
                     if (asciiAction.getAsciiText() != null) {
-                        if (asciiAction.getAsciiText().toLowerCase().contains("TLS negotiation".toLowerCase())) {
+                        String text = asciiAction.getAsciiText().toLowerCase();
+                        if (text.contains("TLS negotiation".toLowerCase()) || text.contains("220".toLowerCase())
+                                || text.contains("OK".toLowerCase())) {
                             return true;
                         }
                     }

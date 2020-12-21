@@ -790,7 +790,7 @@ public class WorkflowConfigurationFactory {
                         ConnectionEndType.SERVER, new ServerGreetingMessage(config)));
                 workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
                         ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_STARTTLS, "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsAsciiAction(config, connection,
+                workflowTrace.addTlsAction(MessageActionFactory.createIssueStarttlsCommandAction(config, connection,
                         ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_STARTTLS, "US-ASCII"));
                 return workflowTrace;
             }
@@ -799,7 +799,7 @@ public class WorkflowConfigurationFactory {
                         ConnectionEndType.SERVER, new ServerGreetingMessage(config)));
                 workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
                         ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_STARTTLS, "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsAsciiAction(config, connection,
+                workflowTrace.addTlsAction(MessageActionFactory.createIssueStarttlsCommandAction(config, connection,
                         ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_STARTTLS, "US-ASCII"));
                 return workflowTrace;
             }
@@ -812,7 +812,7 @@ public class WorkflowConfigurationFactory {
                         ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_CAPA, "US-ASCII"));
                 workflowTrace.addTlsAction(MessageActionFactory.createStarttlsCommunicationAction(config, connection,
                         ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_STARTTLS, "US-ASCII"));
-                workflowTrace.addTlsAction(MessageActionFactory.createStarttlsAsciiAction(config, connection,
+                workflowTrace.addTlsAction(MessageActionFactory.createIssueStarttlsCommandAction(config, connection,
                         ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_STARTTLS, "US-ASCII"));
                 return workflowTrace;
             }
