@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.List;
 
-public class ReceiveStarttlsAction extends AsciiAction {
+public class StarttlsAnswerTillAction extends AsciiAction {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -35,20 +35,10 @@ public class ReceiveStarttlsAction extends AsciiAction {
 
     private StarttlsMessageFactory factory;
 
-    protected ReceiveMessageHelper receiveMessageHelper;
-
-    protected SendMessageHelper sendMessageHelper;
-
-    protected List<AbstractRecord> receivedRecords;
-
-    protected List<ProtocolMessage> receivedMessages;
-
-    public ReceiveStarttlsAction(Config config, String expectedMessage, String encoding) {
+    public StarttlsAnswerTillAction(Config config, String expectedMessage, String encoding) {
         super(encoding);
         this.expectedMessage = expectedMessage;
         this.starttlsType = config.getStarttlsType();
-        this.sendMessageHelper = new SendMessageHelper();
-        this.receiveMessageHelper = new ReceiveMessageHelper();
         this.factory = new StarttlsMessageFactory(config);
     }
 
