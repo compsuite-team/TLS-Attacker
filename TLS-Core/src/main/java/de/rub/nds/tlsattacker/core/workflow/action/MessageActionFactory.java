@@ -53,50 +53,6 @@ public class MessageActionFactory {
         return action;
     }
 
-    public static AsciiAction createIssueStarttlsCommandAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
-        StarttlsMessageFactory factory = new StarttlsMessageFactory(tlsConfig);
-        String message;
-        AsciiAction action;
-        if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
-            message = factory.createSendCommand(commandType);
-            action = new SendStarttlsCommandAction(message, encoding);
-        } else {
-            action = new ReceiveStarttlsCommandAction(encoding);
-        }
-        return action;
-    }
-
-    public static AsciiAction createStarttlsAsciiAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
-        StarttlsMessageFactory factory = new StarttlsMessageFactory(tlsConfig);
-        String message;
-        AsciiAction action;
-        if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
-            message = factory.createSendCommand(commandType);
-            action = new SendAsciiAction(message, encoding);
-        } else {
-            message = factory.createReceiveCommand(commandType);
-            action = new GenericReceiveAsciiAction(encoding);
-        }
-        return action;
-    }
-
-    public static AsciiAction createStarttlsCommunicationAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
-        StarttlsMessageFactory factory = new StarttlsMessageFactory(tlsConfig);
-        AsciiAction action;
-        String message;
-        if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
-            message = factory.createSendCommand(commandType);
-            action = new SendAsciiAction(message, encoding);
-        } else {
-            message = factory.createReceiveCommand(commandType);
-            action = new ReceiveStarttlsAction(tlsConfig, message, encoding);
-        }
-        return action;
-    }
-
     private MessageActionFactory() {
     }
 
