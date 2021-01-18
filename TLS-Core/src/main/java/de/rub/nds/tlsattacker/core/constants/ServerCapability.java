@@ -9,6 +9,7 @@
  */
 package de.rub.nds.tlsattacker.core.constants;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,10 +20,10 @@ public enum ServerCapability {
     IMAP_AUTHDISABLED("AUTH=DISABLED"),
     IMAP_STARTTLS("STARTTLS"),
 
-    POP3_USERPLAIN("USER=PLAIN"),
-    POP3_USERLOGIN("USER=LOGIN"),
-    POP3_SASLPLAIN("SASL=PLAIN"),
-    POP3_SASLLOGIN("SASL=LOGIN"),
+    POP3_USERPLAIN("USER PLAIN"),
+    POP3_USERLOGIN("USER LOGIN"),
+    POP3_SASLPLAIN("SASL PLAIN"),
+    POP3_SASLLOGIN("SASL LOGIN"),
     POP3_CAPA("CAPA"),
     POP3_UIDL("UIDL"),
     POP3_PIPELINING("PIPELINING"),
@@ -35,7 +36,7 @@ public enum ServerCapability {
 
     private final String serverCapability;
 
-    private ServerCapability(String serverCapability) {
+    ServerCapability(String serverCapability) {
         this.serverCapability = serverCapability;
     }
 
@@ -46,10 +47,10 @@ public enum ServerCapability {
     public static ServerCapability getCapabilityFromString(StarttlsType type, String str) {
         String comparison = str;
         for (ServerCapability capability : getImplemented(type)) {
-            if (type == StarttlsType.IMAP && comparison.startsWith("250-"))
-                comparison = comparison.substring(4, comparison.length());
+            if (type == StarttlsType.SMTP && comparison.startsWith("250-"))
+                comparison = comparison.substring(4);
             // TODO: Comparison in UpperCase|LowerCase?
-            if (capability.getServerCapability().equals(comparison))
+            if (capability.getServerCapability().equalsIgnoreCase(comparison))
                 return capability;
         }
         return null;
@@ -96,6 +97,20 @@ public enum ServerCapability {
         list.add(SMTP_AUTHPLAIN);
         list.add(SMTP_AUTHLOGIN);
         return list;
+    }
+
+    public static boolean offersPlainLogin(StarttlsType type, String serverCapability) {
+        List<ServerCapability> plainLogins = getPlainLogin();
+        ServerCapability capability = getCapabilityFromString(type, serverCapability);
+        if (capability != null) {
+            if (plainLogins.contains(capability))
+                return true;
+        } else if ((type == StarttlsType.POP3 && (serverCapability.startsWith("SASL") || serverCapability
+                .startsWith("AUTH"))) || (type == StarttlsType.SMTP && serverCapability.startsWith("250-AUTH"))) {
+            if (serverCapability.contains("PLAIN") || serverCapability.contains("LOGIN"))
+                return true;
+        }
+        return false;
     }
 
 }
