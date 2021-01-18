@@ -143,7 +143,13 @@ public class WorkflowTrace implements Serializable {
             @XmlElement(type = SendAsciiAction.class, name = "SendAscii"),
             @XmlElement(type = FlushSessionCacheAction.class, name = "FlushSessionCache"),
             @XmlElement(type = GenericReceiveAsciiAction.class, name = "GenericReceiveAscii"),
-            @XmlElement(type = ReceiveAsciiAction.class, name = "ReceiveAscii") })
+            @XmlElement(type = ReceiveAsciiAction.class, name = "ReceiveAscii"),
+            @XmlElement(type = ReceiveServerCapabilitiesAction.class, name = "ReceiveServerCapabilities"),
+            @XmlElement(type = ReceiveServerGreetingAction.class, name = "ReceiveServerGreeting"),
+            @XmlElement(type = StarttlsAnswerTillAction.class, name = "ReceiveStarttls"),
+            @XmlElement(type = SendServerCapabilitiesAction.class, name = "SendServerCapabilities"),
+            @XmlElement(type = SendServerGreetingAction.class, name = "SendServerGreeting"),
+            @XmlElement(type = SendStarttlsCommandAction.class, name = "SendStarttlsCommand") })
     private List<TlsAction> tlsActions = new ArrayList<>();
 
     private String name = null;

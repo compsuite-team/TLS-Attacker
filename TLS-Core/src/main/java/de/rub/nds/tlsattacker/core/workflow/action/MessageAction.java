@@ -13,8 +13,6 @@ import de.rub.nds.modifiablevariable.HoldsModifiableVariable;
 import de.rub.nds.tlsattacker.core.https.HttpsRequestMessage;
 import de.rub.nds.tlsattacker.core.https.HttpsResponseMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.*;
-import de.rub.nds.tlsattacker.core.protocol.message.ServerCapaMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.ServerGreetingMessage;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.BlobRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
@@ -85,9 +83,7 @@ public abstract class MessageAction extends ConnectionBoundAction {
             @XmlElement(type = EndOfEarlyDataMessage.class, name = "EndOfEarlyData"),
             @XmlElement(type = EncryptedExtensionsMessage.class, name = "EncryptedExtensions"),
             @XmlElement(type = DtlsHandshakeMessageFragment.class, name = "DtlsHandshakeMessageFragment"),
-            @XmlElement(type = HelloRetryRequestMessage.class, name = "HelloRetryRequest"),
-            @XmlElement(type = ServerCapaMessage.class, name = "ServerCapa"),
-            @XmlElement(type = ServerGreetingMessage.class, name = "ServerGreeting") })
+            @XmlElement(type = HelloRetryRequestMessage.class, name = "HelloRetryRequest") })
     protected List<ProtocolMessage> messages = new ArrayList<>();
 
     @HoldsModifiableVariable
