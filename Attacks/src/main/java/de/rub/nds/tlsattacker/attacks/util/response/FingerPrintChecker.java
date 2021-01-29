@@ -68,7 +68,7 @@ public class FingerPrintChecker {
 
                     } else {
                         // Comparing BlobRecords
-                        if (java.util.Arrays.equals(fingerprint1.getRecordList().get(i).getCompleteRecordBytes()
+                        if (!java.util.Arrays.equals(fingerprint1.getRecordList().get(i).getCompleteRecordBytes()
                                 .getValue(), fingerprint2.getRecordList().get(i).getCompleteRecordBytes().getValue())) {
                             return EqualityError.RECORD_CONTENT;
                         }

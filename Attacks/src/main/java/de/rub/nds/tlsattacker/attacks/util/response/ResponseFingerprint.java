@@ -9,14 +9,19 @@
  */
 package de.rub.nds.tlsattacker.attacks.util.response;
 
+import de.rub.nds.modifiablevariable.util.ArrayConverter;
 import de.rub.nds.tlsattacker.core.constants.AlertDescription;
 import de.rub.nds.tlsattacker.core.constants.AlertLevel;
 import de.rub.nds.tlsattacker.core.protocol.message.AlertMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.FinishedMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ProtocolMessage;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
+import de.rub.nds.tlsattacker.core.record.BlobRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
 import de.rub.nds.tlsattacker.transport.socket.SocketState;
+import org.bouncycastle.util.encoders.Hex;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -140,7 +145,7 @@ public class ResponseFingerprint {
                 if (record instanceof Record) {
                     resultString.append("R(" + ((Record) record).getLength().getValue() + "),");
                 } else {
-                    resultString.append("B(" + ((Record) record).getLength().getValue() + "),");
+                    resultString.append("B(" + ((BlobRecord) record).getCompleteRecordBytes().getValue().length + "),");
                 }
             }
             resultString.deleteCharAt(resultString.length() - 1); // remove last
