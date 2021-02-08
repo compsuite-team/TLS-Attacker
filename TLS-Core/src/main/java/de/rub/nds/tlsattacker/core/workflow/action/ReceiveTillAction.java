@@ -45,6 +45,7 @@ public class ReceiveTillAction extends MessageAction implements ReceivingAction 
             @XmlElement(type = PWDServerKeyExchangeMessage.class, name = "PWDServerKeyExchange"),
             @XmlElement(type = PWDClientKeyExchangeMessage.class, name = "PWDClientKeyExchange"),
             @XmlElement(type = FinishedMessage.class, name = "Finished"),
+            @XmlElement(type = RSAServerKeyExchangeMessage.class, name = "RSAServerKeyExchange"),
             @XmlElement(type = RSAClientKeyExchangeMessage.class, name = "RSAClientKeyExchange"),
             @XmlElement(type = ServerHelloDoneMessage.class, name = "ServerHelloDone"),
             @XmlElement(type = ServerHelloMessage.class, name = "ServerHello"),

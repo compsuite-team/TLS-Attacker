@@ -74,6 +74,7 @@ public class ForwardMessagesAction extends TlsAction implements ReceivingAction,
             @XmlElement(type = PWDServerKeyExchangeMessage.class, name = "PWDServerKeyExchange"),
             @XmlElement(type = PWDClientKeyExchangeMessage.class, name = "PWDClientKeyExchange"),
             @XmlElement(type = FinishedMessage.class, name = "Finished"),
+            @XmlElement(type = RSAServerKeyExchangeMessage.class, name = "RSAServerKeyExchange"),
             @XmlElement(type = RSAClientKeyExchangeMessage.class, name = "RSAClientKeyExchange"),
             @XmlElement(type = GOSTClientKeyExchangeMessage.class, name = "GOSTClientKeyExchange"),
             @XmlElement(type = ServerHelloDoneMessage.class, name = "ServerHelloDone"),
@@ -128,6 +129,7 @@ public class ForwardMessagesAction extends TlsAction implements ReceivingAction,
             @XmlElement(type = ECDHEServerKeyExchangeMessage.class, name = "ECDHEServerKeyExchange"),
             @XmlElement(type = PskClientKeyExchangeMessage.class, name = "PSKClientKeyExchange"),
             @XmlElement(type = FinishedMessage.class, name = "Finished"),
+            @XmlElement(type = RSAServerKeyExchangeMessage.class, name = "RSAServerKeyExchange"),
             @XmlElement(type = RSAClientKeyExchangeMessage.class, name = "RSAClientKeyExchange"),
             @XmlElement(type = GOSTClientKeyExchangeMessage.class, name = "GOSTClientKeyExchange"),
             @XmlElement(type = ServerHelloDoneMessage.class, name = "ServerHelloDone"),
@@ -182,6 +184,7 @@ public class ForwardMessagesAction extends TlsAction implements ReceivingAction,
             @XmlElement(type = ECDHEServerKeyExchangeMessage.class, name = "ECDHEServerKeyExchange"),
             @XmlElement(type = PskClientKeyExchangeMessage.class, name = "PSKClientKeyExchange"),
             @XmlElement(type = FinishedMessage.class, name = "Finished"),
+            @XmlElement(type = RSAServerKeyExchangeMessage.class, name = "RSAServerKeyExchange"),
             @XmlElement(type = RSAClientKeyExchangeMessage.class, name = "RSAClientKeyExchange"),
             @XmlElement(type = GOSTClientKeyExchangeMessage.class, name = "GOSTClientKeyExchange"),
             @XmlElement(type = ServerHelloDoneMessage.class, name = "ServerHelloDone"),
@@ -301,8 +304,7 @@ public class ForwardMessagesAction extends TlsAction implements ReceivingAction,
     /**
      * Apply the contents of the messages to the given TLS context.
      *
-     * @param protocolMessages
-     * @param tlsContext
+     * @param ctx
      */
     private void applyMessages(TlsContext ctx) {
         for (ProtocolMessage msg : receivedMessages) {

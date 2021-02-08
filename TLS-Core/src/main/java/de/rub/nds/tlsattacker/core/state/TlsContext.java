@@ -688,6 +688,11 @@ public class TlsContext {
         keylogfile = new Keylogfile(this);
     }
 
+    public void setConfig(Config config) {
+        this.config = config;
+        this.chooser = null;
+    }
+
     public Chooser getChooser() {
         if (chooser == null) {
             chooser = ChooserFactory.getChooser(config.getChooserType(), this, config);

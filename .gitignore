@@ -51,3 +51,4 @@ test.sh
 .classpath
 .idea
 *.iml
+.factorypath

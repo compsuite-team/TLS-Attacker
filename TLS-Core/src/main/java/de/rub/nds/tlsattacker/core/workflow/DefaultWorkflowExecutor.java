@@ -53,7 +53,9 @@ public class DefaultWorkflowExecutor extends WorkflowExecutor {
             ctx.initRecordLayer();
         }
 
-        state.getWorkflowTrace().reset();
+        if (config.isResetTrace()) {
+            state.getWorkflowTrace().reset();
+        }
         int numTlsContexts = allTlsContexts.size();
         List<TlsAction> tlsActions = state.getWorkflowTrace().getTlsActions();
         for (TlsAction action : tlsActions) {
@@ -73,7 +75,9 @@ public class DefaultWorkflowExecutor extends WorkflowExecutor {
             }
 
             try {
-                action.execute(state);
+                if (!config.isSkipExecutedActions() || !action.isExecuted()) {
+                    action.execute(state);
+                }
             } catch (PreparationException | WorkflowExecutionException ex) {
                 throw new WorkflowExecutionException("Problem while executing Action:" + action.toString(), ex);
             }

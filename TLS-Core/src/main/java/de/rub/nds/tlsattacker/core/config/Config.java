@@ -79,6 +79,22 @@ public class Config implements Serializable {
 
     }
 
+    public Boolean isResetTrace() {
+        return resetTrace;
+    }
+
+    public void setResetTrace(Boolean resetTrace) {
+        this.resetTrace = resetTrace;
+    }
+
+    public Boolean isSkipExecutedActions() {
+        return skipExecutedActions;
+    }
+
+    public void setSkipExecutedActions(Boolean skipExecutedActions) {
+        this.skipExecutedActions = skipExecutedActions;
+    }
+
     public static Config createConfig(File f) {
         return ConfigIO.read(f);
     }
@@ -826,6 +842,16 @@ public class Config implements Serializable {
     private Boolean stopReceivingAfterFatal = false;
 
     private Boolean stopActionsAfterFatal = false;
+
+    /**
+     * The WorkflowExecutor shall skip all already executed actions.
+     */
+    private Boolean skipExecutedActions = false;
+    /**
+     * Whether the WorkflowExecutor shall reset the WorkflowTrace.
+     */
+    private Boolean resetTrace = true;
+
     /**
      * This CipherSuite will be used if no cipherSuite has been negotiated yet
      */
