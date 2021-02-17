@@ -17,13 +17,11 @@ public enum ServerCapability {
     IMAP_IMAP4rev1("IMAP4rev1"),
     IMAP_AUTHPLAIN("AUTH=PLAIN"),
     IMAP_AUTHLOGIN("AUTH=LOGIN"),
-    IMAP_AUTHDISABLED("AUTH=DISABLED"),
+    IMAP_LOGINDISABLED("LOGINDISABLED"),
     IMAP_STARTTLS("STARTTLS"),
 
-    POP3_USERPLAIN("USER PLAIN"),
-    POP3_USERLOGIN("USER LOGIN"),
-    POP3_SASLPLAIN("SASL PLAIN"),
-    POP3_SASLLOGIN("SASL LOGIN"),
+    POP3_USERPLAIN("USER"),
+    POP3_SASLPLAINLOGIN("SASL PLAIN LOGIN"),
     POP3_CAPA("CAPA"),
     POP3_UIDL("UIDL"),
     POP3_PIPELINING("PIPELINING"),
@@ -63,14 +61,12 @@ public enum ServerCapability {
                 list.add(IMAP_IMAP4rev1);
                 list.add(IMAP_AUTHPLAIN);
                 list.add(IMAP_AUTHLOGIN);
-                list.add(IMAP_AUTHDISABLED);
+                list.add(IMAP_LOGINDISABLED);
                 list.add(IMAP_STARTTLS);
                 break;
             case POP3:
                 list.add(POP3_USERPLAIN);
-                list.add(POP3_USERLOGIN);
-                list.add(POP3_SASLPLAIN);
-                list.add(POP3_SASLLOGIN);
+                list.add(POP3_SASLPLAINLOGIN);
                 list.add(POP3_CAPA);
                 list.add(POP3_UIDL);
                 list.add(POP3_PIPELINING);
@@ -91,12 +87,18 @@ public enum ServerCapability {
         list.add(IMAP_AUTHPLAIN);
         list.add(IMAP_AUTHLOGIN);
         list.add(POP3_USERPLAIN);
-        list.add(POP3_USERLOGIN);
-        list.add(POP3_SASLPLAIN);
-        list.add(POP3_SASLLOGIN);
+        list.add(POP3_SASLPLAINLOGIN);
         list.add(SMTP_AUTHPLAIN);
         list.add(SMTP_AUTHLOGIN);
         return list;
+    }
+
+    public static boolean isLoginDisabled(ServerCapability capa) {
+        return capa == IMAP_LOGINDISABLED;
+    }
+
+    public static boolean isStarttlsCommand(ServerCapability capa) {
+        return capa == SMTP_STARTTLS || capa == IMAP_STARTTLS || capa == POP3_STLS;
     }
 
     public static boolean offersPlainLogin(StarttlsType type, String serverCapability) {
