@@ -16,17 +16,21 @@ import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class StarttlsMessageFactory {
 
-    private final Config config;
+    private Config config;
 
-    private final StarttlsType starttlsType;
+    private StarttlsType starttlsType;
 
     public StarttlsMessageFactory(Config config) {
         this.config = config;
         this.starttlsType = config.getStarttlsType();
+    }
+
+    private StarttlsMessageFactory() {
     }
 
     // TODO:Split createCommand in Send & Receive
@@ -34,20 +38,21 @@ public class StarttlsMessageFactory {
         return createCommand(commandType, "abc");
     }
 
-    public String createReceiveCommand(CommandType commandType) {
+    public String createResponseCommand(CommandType commandType) {
         return createCommand(commandType, "");
     }
 
     public String createCommand(CommandType commandType, String tag) {
         // TODO: How to handle empty capabilities?
+        // TODO: How to handle empty
         String IMAPTag = tag;
         if (!"".equals(IMAPTag))
             IMAPTag = IMAPTag + " ";
         switch (starttlsType) {
             case IMAP: {
                 StringBuilder builder = new StringBuilder();
-                for (ServerCapability capa : config.getDefaultServerCapabilities()) {
-                    builder.append("\r\n" + capa.getServerCapability());
+                for (ServerCapability capa : getDefaultCapabilities()) {
+                    builder.append(" " + capa.getServerCapability());
                 }
                 switch (commandType) {
                     case S_CONNECTED:
@@ -55,7 +60,7 @@ public class StarttlsMessageFactory {
                     case C_CAPA:
                         return IMAPTag + "CAPABILITY\r\n";
                     case S_CAPA:
-                        return "* " + builder.toString() + "\r\n" + IMAPTag + " OK\r\n";
+                        return "* CAPABILITY" + builder.toString() + "\r\n" + IMAPTag + "OK\r\n";
                     case C_STARTTLS:
                         return IMAPTag + "STARTTLS\r\n";
                     case S_STARTTLS:
@@ -79,7 +84,7 @@ public class StarttlsMessageFactory {
                     case S_CAPA:
                         StringBuilder builder = new StringBuilder();
                         builder.append("+OK");
-                        for (ServerCapability capa : config.getDefaultServerCapabilities()) {
+                        for (ServerCapability capa : getDefaultCapabilities()) {
                             builder.append("\r\n" + capa.getServerCapability());
                         }
                         builder.append("\r\n.\r\n");
@@ -101,9 +106,9 @@ public class StarttlsMessageFactory {
                     case S_CONNECTED:
                         return "220 mail.example.com Hello from SMTP\r\n";
                     case C_CAPA:
-                        return "EHLO mail.exampl.com\r\n";
+                        return "EHLO mail.example.com\r\n";
                     case S_CAPA:
-                        List<ServerCapability> capabilities = config.getDefaultServerCapabilities();
+                        List<ServerCapability> capabilities = getDefaultCapabilities();
                         StringBuilder builder = new StringBuilder();
                         builder.append("250-mail.example.org\r\n");
                         if (!capabilities.isEmpty()) {
@@ -130,6 +135,37 @@ public class StarttlsMessageFactory {
             }
         }
         return "";
+    }
+
+    public String createExpectedCommand(CommandType commandType) {
+        switch (starttlsType) {
+            case IMAP: {
+                switch (commandType) {
+                    case C_STARTTLS:
+                        return "STARTTLS";
+                }
+            }
+            case POP3:
+                switch (commandType) {
+                    case C_STARTTLS:
+                        return "STLS";
+                }
+
+            case SMTP:
+                switch (commandType) {
+                    case C_CAPA:
+                        return "EHLO";
+                    case C_STARTTLS:
+                        return "STARTTLS";
+                }
+        }
+        return null;
+    }
+
+    private List<ServerCapability> getDefaultCapabilities() {
+        if (config.getDefaultServerCapabilities() == null || config.getDefaultServerCapabilities().isEmpty())
+            return ServerCapability.getImplemented(starttlsType);
+        return config.getDefaultServerCapabilities();
     }
 
     public enum CommandType {
