@@ -75,6 +75,10 @@ public abstract class SendStarttlsAsciiAction extends AsciiAction {
         }
     }
 
+    public Config getConfig() {
+        return config;
+    }
+
     public abstract String initAsciiText(TlsContext tlsContext);
 
     public abstract String getActionInfo();
