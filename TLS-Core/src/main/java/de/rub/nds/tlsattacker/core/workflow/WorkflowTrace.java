@@ -149,7 +149,7 @@ public class WorkflowTrace implements Serializable {
             @XmlElement(type = StarttlsAnswerTillAction.class, name = "ReceiveStarttls"),
             @XmlElement(type = SendServerCapabilitiesAction.class, name = "SendServerCapabilities"),
             @XmlElement(type = SendServerGreetingAction.class, name = "SendServerGreeting"),
-            @XmlElement(type = SendStarttlsCommandAction.class, name = "SendStarttlsCommand") })
+            @XmlElement(type = SendStarttlsResponseAction.class, name = "SendStarttlsCommand") })
     private List<TlsAction> tlsActions = new ArrayList<>();
 
     private String name = null;

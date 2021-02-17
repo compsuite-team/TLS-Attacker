@@ -26,9 +26,9 @@ public class StarttlsActionFactory {
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
             message = factory.createSendCommand(commandType);
-            action = new SendStarttlsCommandAction(message, encoding);
+            action = new SendStarttlsResponseAction(encoding, tlsConfig);
         } else {
-            action = new ReceiveStarttlsCommandAction(encoding);
+            action = new ReceiveStarttlsResponseAction(encoding);
         }
         return action;
     }
@@ -42,7 +42,6 @@ public class StarttlsActionFactory {
             message = factory.createSendCommand(commandType);
             action = new SendAsciiAction(message, encoding);
         } else {
-            message = factory.createReceiveCommand(commandType);
             action = new GenericReceiveAsciiAction(encoding);
         }
         return action;
@@ -57,7 +56,7 @@ public class StarttlsActionFactory {
             message = factory.createSendCommand(commandType);
             action = new SendAsciiAction(message, encoding);
         } else {
-            message = factory.createReceiveCommand(commandType);
+            message = factory.createExpectedCommand(commandType);
             action = new StarttlsAnswerTillAction(tlsConfig, message, encoding);
         }
         return action;

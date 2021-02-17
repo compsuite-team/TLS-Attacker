@@ -17,9 +17,9 @@ package de.rub.nds.tlsattacker.core.workflow.action;
  *         ConnectivityChecker to determine if both parties agreed to execute
  *         TLS (SpeakStarttls)
  */
-public class ReceiveStarttlsCommandAction extends GenericReceiveAsciiAction {
+public class ReceiveStarttlsResponseAction extends GenericReceiveAsciiAction {
 
-    public ReceiveStarttlsCommandAction(String encoding) {
+    public ReceiveStarttlsResponseAction(String encoding) {
         super(encoding);
     }
 

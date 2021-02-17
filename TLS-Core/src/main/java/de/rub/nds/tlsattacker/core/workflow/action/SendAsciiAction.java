@@ -21,7 +21,7 @@ public class SendAsciiAction extends AsciiAction {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private SendAsciiAction() {
+    public SendAsciiAction() {
     }
 
     public SendAsciiAction(String asciiString, String encoding) {

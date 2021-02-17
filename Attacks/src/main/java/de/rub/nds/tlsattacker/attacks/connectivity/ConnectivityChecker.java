@@ -115,7 +115,7 @@ public class ConnectivityChecker {
         executor.executeWorkflow();
         if (trace.allActionsExecuted()) {
             for (TlsAction action : trace.getTlsActions()) {
-                if (action instanceof ReceiveStarttlsCommandAction || action instanceof SendStarttlsCommandAction) {
+                if (action instanceof ReceiveStarttlsResponseAction || action instanceof SendStarttlsResponseAction) {
                     AsciiAction asciiAction = (AsciiAction) action;
                     if (asciiAction.getAsciiText() != null) {
                         String text = asciiAction.getAsciiText().toLowerCase();
