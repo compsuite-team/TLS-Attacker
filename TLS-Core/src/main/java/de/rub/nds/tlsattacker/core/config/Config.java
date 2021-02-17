@@ -1049,6 +1049,10 @@ public class Config implements Serializable {
 
     private StarttlsType starttlsType = StarttlsType.NONE;
 
+    private String plainUser = "";
+
+    private String plainPwd = "";
+
     /**
      * The Ticket Lifetime Hint, Ticket Key and Ticket Key Name used in the
      * Extension defined in RFC5077, followed by additional TLS 1.3 draft 21
@@ -3248,6 +3252,22 @@ public class Config implements Serializable {
 
     public void setStarttlsType(StarttlsType starttlsType) {
         this.starttlsType = starttlsType;
+    }
+
+    public String getPlainUser() {
+        return plainUser;
+    }
+
+    public void setPlainUser(String plainUser) {
+        this.plainUser = plainUser;
+    }
+
+    public String getPlainPwd() {
+        return plainPwd;
+    }
+
+    public void setPlainPwd(String plainPwd) {
+        this.plainPwd = plainPwd;
     }
 
     public BigInteger getDefaultKeySharePrivateKey() {

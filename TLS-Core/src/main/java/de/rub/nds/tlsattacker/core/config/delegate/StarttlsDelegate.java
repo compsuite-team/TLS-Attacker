@@ -20,6 +20,13 @@ public class StarttlsDelegate extends Delegate {
     @Parameter(names = "-starttls", required = false, description = "Starttls protocol. Choose from ftp, imap, pop3, smtp.", converter = StarttlsTypeConverter.class)
     private StarttlsType starttlsType = StarttlsType.NONE;
 
+    // TODO: Define default Username & Password
+    @Parameter(names = "-plainUser", required = false, description = "Username for testing if server accepts plain logins.")
+    private String plainUser = "admin";
+
+    @Parameter(names = "-plainPwd", required = false, description = "Password for testing if the server accepts plain logins.")
+    private String plainPwd = "pass";
+
     public StarttlsDelegate() {
 
     }
@@ -32,9 +39,27 @@ public class StarttlsDelegate extends Delegate {
         this.starttlsType = starttlsType;
     }
 
+    public String getPlainUser() {
+        return plainUser;
+    }
+
+    public void setPlainUser(String plainUser) {
+        this.plainUser = plainUser;
+    }
+
+    public String getPlainPwd() {
+        return plainPwd;
+    }
+
+    public void setPlainPwd(String plainPwd) {
+        this.plainPwd = plainPwd;
+    }
+
     @Override
     public void applyDelegate(Config config) throws ConfigurationException {
         config.setStarttlsType(starttlsType);
+        config.setPlainUser(plainUser);
+        config.setPlainPwd(plainPwd);
     }
 
 }
