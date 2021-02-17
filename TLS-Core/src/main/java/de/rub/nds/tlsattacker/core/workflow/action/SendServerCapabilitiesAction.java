@@ -40,41 +40,11 @@ public class SendServerCapabilitiesAction extends SendStarttlsAsciiAction {
         super(encoding, config);
     }
 
-    // TODO: Capabilities aus Messagefactory heraus erzeugen.
     @Override
     public String initAsciiText(TlsContext tlsContext) {
         Chooser chooser = tlsContext.getChooser();
-        List<ServerCapability> capabilities = chooser.getConfig().getDefaultServerCapabilities();
-        StarttlsMessageFactory factory = new StarttlsMessageFactory(chooser.getConfig());
-        StringBuilder builder = new StringBuilder();
-        switch (getType()) {
-            case IMAP: {
-                builder.append("*");
-                for (ServerCapability capa : capabilities) {
-                    builder.append(" " + capa.getServerCapability());
-                }
-                builder.append("\r\n" + tlsContext.getRecentIMAPTag() + " OK");
-                break;
-            }
-            case POP3: {
-                builder.append("+OK");
-                for (ServerCapability capa : capabilities) {
-                    builder.append("\r\n" + capa.getServerCapability());
-                }
-                builder.append("\r\n.\r\n");
-                break;
-            }
-            case SMTP: {
-                builder.append("250-mail.example.org");
-                for (ServerCapability capa : capabilities) {
-                    if (capa != capabilities.get(capabilities.size() - 1))
-                        builder.append("\r\n250-" + capa.getServerCapability());
-                    else
-                        builder.append("\r\n250 " + capa.getServerCapability());
-                }
-            }
-        }
-        return builder.toString();
+        StarttlsMessageFactory factory = new StarttlsMessageFactory(getConfig());
+        return factory.createCommand(StarttlsMessageFactory.CommandType.S_CAPA, tlsContext.getRecentIMAPTag());
     }
 
     @Override
@@ -89,6 +59,6 @@ public class SendServerCapabilitiesAction extends SendStarttlsAsciiAction {
 
     @Override
     public String getActionInfo() {
-        return "Sending Server Capabilities";
+        return "Sending Server Capabilities: ";
     }
 }
