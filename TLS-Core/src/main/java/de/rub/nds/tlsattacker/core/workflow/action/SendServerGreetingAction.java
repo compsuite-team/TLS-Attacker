@@ -52,6 +52,7 @@ public class SendServerGreetingAction extends SendStarttlsAsciiAction {
                 else {
                     builder.append("* OK");
                     if (isCapaInGreeting) {
+                        // TODO: DefaultServerCapabilities from Factory
                         List<ServerCapability> capabilities = chooser.getConfig().getDefaultServerCapabilities();
                         if (capabilities != null && !capabilities.isEmpty()) {
                             builder.append(" [");
@@ -62,6 +63,7 @@ public class SendServerGreetingAction extends SendStarttlsAsciiAction {
                         }
                     }
                 }
+                builder.append("\r\n");
                 break;
             }
             case POP3:
@@ -84,6 +86,6 @@ public class SendServerGreetingAction extends SendStarttlsAsciiAction {
 
     @Override
     public String getActionInfo() {
-        return "Sending Server Greeting:";
+        return "Sending Server Greeting: ";
     }
 }
