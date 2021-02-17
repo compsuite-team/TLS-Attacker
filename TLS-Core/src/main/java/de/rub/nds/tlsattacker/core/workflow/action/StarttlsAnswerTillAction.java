@@ -23,23 +23,34 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class StarttlsAnswerTillAction extends AsciiAction {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final String expectedMessage;
+    private String expectedMessage;
 
-    private final StarttlsType starttlsType;
+    private StarttlsType starttlsType;
 
     private StarttlsMessageFactory factory;
 
-    public StarttlsAnswerTillAction(Config config, String expectedMessage, String encoding) {
+    private String connectionAlias;
+
+    public StarttlsAnswerTillAction() {
+        super();
+    }
+
+    public StarttlsAnswerTillAction(Config config, String expectedMessage, String encoding) {// ,
+                                                                                             // String
+                                                                                             // connectionAlias)
+                                                                                             // {
         super(encoding);
         this.expectedMessage = expectedMessage;
         this.starttlsType = config.getStarttlsType();
         this.factory = new StarttlsMessageFactory(config);
+        // this.connectionAlias = connectionAlias;
     }
 
     /**
@@ -59,14 +70,19 @@ public class StarttlsAnswerTillAction extends AsciiAction {
         }
         try {
             LOGGER.debug("Receiving STARTTLS Messages...");
-            boolean receivedExpectedMessage = false;
-            while (!receivedExpectedMessage) {
+            while (true) {
                 byte[] fetchData = tlsContext.getTransportHandler().fetchData();
+
                 String receivedMessage = new String(fetchData, getEncoding());
+                LOGGER.debug("Received: " + receivedMessage);
                 if (receivedMessage == null || receivedMessage.isEmpty())
+                    continue;
+                if (receivedMessage.contains(expectedMessage)) {
+                    if (starttlsType == StarttlsType.IMAP)
+                        tlsContext.setRecentIMAPTag(receivedMessage.split(" ")[0]);
+                    setExecuted(true);
                     break;
-                if (receivedMessage.contains(expectedMessage))
-                    receivedExpectedMessage = true;
+                }
 
                 else {
                     String answer = "";
@@ -106,6 +122,7 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                             break;
                         }
                     }
+                    LOGGER.debug("Responding: " + answer);
                     tlsContext.getTransportHandler().sendData(answer.getBytes(getEncoding()));
                 }
             }
@@ -123,6 +140,6 @@ public class StarttlsAnswerTillAction extends AsciiAction {
 
     @Override
     public boolean executedAsPlanned() {
-        return false;
+        return isExecuted();
     }
 }
