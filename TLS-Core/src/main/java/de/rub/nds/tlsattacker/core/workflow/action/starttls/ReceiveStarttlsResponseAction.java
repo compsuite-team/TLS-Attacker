@@ -7,7 +7,9 @@
  * Licensed under Apache License 2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.rub.nds.tlsattacker.core.workflow.action;
+package de.rub.nds.tlsattacker.core.workflow.action.starttls;
+
+import de.rub.nds.tlsattacker.core.workflow.action.GenericReceiveAsciiAction;
 
 /**
  * @author Till Budde - tbudde2@mail.uni-paderborn.de

@@ -7,21 +7,18 @@
  * Licensed under Apache License 2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.rub.nds.tlsattacker.core.workflow.action;
+package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.exceptions.WorkflowExecutionException;
-import de.rub.nds.tlsattacker.core.protocol.message.ProtocolMessage;
-import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
-import de.rub.nds.tlsattacker.core.workflow.action.executor.MessageActionResult;
-import de.rub.nds.tlsattacker.core.workflow.action.executor.ReceiveMessageHelper;
-import de.rub.nds.tlsattacker.core.workflow.action.executor.SendMessageHelper;
+import de.rub.nds.tlsattacker.core.workflow.action.AsciiAction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,21 +33,22 @@ public class StarttlsAnswerTillAction extends AsciiAction {
 
     private StarttlsMessageFactory factory;
 
-    private String connectionAlias;
+    private List<String> receivedMessages;
+
+    @XmlTransient
+    private boolean unexpectedMessage;
 
     public StarttlsAnswerTillAction() {
         super();
     }
 
-    public StarttlsAnswerTillAction(Config config, String expectedMessage, String encoding) {// ,
-                                                                                             // String
-                                                                                             // connectionAlias)
-                                                                                             // {
+    public StarttlsAnswerTillAction(Config config, String expectedMessage, String encoding) {
         super(encoding);
         this.expectedMessage = expectedMessage;
         this.starttlsType = config.getStarttlsType();
         this.factory = new StarttlsMessageFactory(config);
-        // this.connectionAlias = connectionAlias;
+        receivedMessages = new ArrayList<String>();
+        unexpectedMessage = false;
     }
 
     /**
@@ -74,9 +72,11 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                 byte[] fetchData = tlsContext.getTransportHandler().fetchData();
 
                 String receivedMessage = new String(fetchData, getEncoding());
-                LOGGER.debug("Received: " + receivedMessage);
                 if (receivedMessage == null || receivedMessage.isEmpty())
-                    continue;
+                    break;
+
+                receivedMessages.add(receivedMessage);
+
                 if (receivedMessage.contains(expectedMessage)) {
                     if (starttlsType == StarttlsType.IMAP)
                         tlsContext.setRecentIMAPTag(receivedMessage.split(" ")[0]);
@@ -85,6 +85,7 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                 }
 
                 else {
+
                     String answer = "";
                     // Answer to specific protocol commands.
                     switch (starttlsType) {
@@ -100,7 +101,8 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                             else if (receivedMessage.contains("LOGOUT")) {
                                 answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_BYE, IMAPTag);
                                 // TODO: Terminate connection.
-                            }
+                            } else
+                                setUnexpectedMessage(true);
                             break;
                         }
                         case POP3: {
@@ -108,6 +110,8 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                                 answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CAPA);
                             if (receivedMessage.contains("QUIT"))
                                 answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_BYE);
+                            else
+                                setUnexpectedMessage(true);
                             // TODO: Terminate connection.
                             break;
                         }
@@ -118,6 +122,7 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                                 answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CAPA);
                             if (receivedMessage.contains("QUIT"))
                                 answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_BYE);
+                            setUnexpectedMessage(true);
                             // TODO: Terminate connection.
                             break;
                         }
@@ -126,6 +131,8 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                     tlsContext.getTransportHandler().sendData(answer.getBytes(getEncoding()));
                 }
             }
+            setAsciiText(String.join("", receivedMessages));
+            LOGGER.info("Received Messages from StarttlsAnswerTillAction: " + getAsciiText());
 
         } catch (IOException e) {
             LOGGER.debug(e);
@@ -136,6 +143,18 @@ public class StarttlsAnswerTillAction extends AsciiAction {
     @Override
     public void reset() {
 
+    }
+
+    public void setUnexpectedMessage(boolean unexpectedMessage) {
+        this.unexpectedMessage = unexpectedMessage;
+    }
+
+    public boolean ReceivedUnexpectedMessage() {
+        return unexpectedMessage;
+    }
+
+    public List<String> getReceivedMessages() {
+        return receivedMessages;
     }
 
     @Override

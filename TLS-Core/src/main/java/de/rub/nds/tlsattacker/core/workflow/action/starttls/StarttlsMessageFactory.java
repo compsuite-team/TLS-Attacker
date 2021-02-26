@@ -7,16 +7,12 @@
  * Licensed under Apache License 2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.rub.nds.tlsattacker.core.workflow.action;
+package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
-import de.rub.nds.tlsattacker.core.config.TLSDelegateConfig;
 import de.rub.nds.tlsattacker.core.constants.ServerCapability;
 import de.rub.nds.tlsattacker.core.constants.StarttlsType;
-import de.rub.nds.tlsattacker.core.state.TlsContext;
-import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class StarttlsMessageFactory {
@@ -52,7 +48,8 @@ public class StarttlsMessageFactory {
             case IMAP: {
                 StringBuilder builder = new StringBuilder();
                 for (ServerCapability capa : getDefaultCapabilities()) {
-                    builder.append(" " + capa.getServerCapability());
+                    if (!(commandType == CommandType.S_CAPA && capa == ServerCapability.IMAP_CAPABILITY))
+                        builder.append(" " + capa.getServerCapability());
                 }
                 switch (commandType) {
                     case S_CONNECTED:
@@ -60,7 +57,7 @@ public class StarttlsMessageFactory {
                     case C_CAPA:
                         return IMAPTag + "CAPABILITY\r\n";
                     case S_CAPA:
-                        return "* CAPABILITY" + builder.toString() + "\r\n" + IMAPTag + "OK\r\n";
+                        return "* CAPABILITY" + builder.toString() + "\r\n" + IMAPTag + "OK caps done\r\n";
                     case C_STARTTLS:
                         return IMAPTag + "STARTTLS\r\n";
                     case S_STARTTLS:
@@ -141,6 +138,8 @@ public class StarttlsMessageFactory {
         switch (starttlsType) {
             case IMAP: {
                 switch (commandType) {
+                    case C_CAPA:
+                        return "CAPABILITY";
                     case C_STARTTLS:
                         return "STARTTLS";
                 }
@@ -162,7 +161,7 @@ public class StarttlsMessageFactory {
         return null;
     }
 
-    private List<ServerCapability> getDefaultCapabilities() {
+    public List<ServerCapability> getDefaultCapabilities() {
         if (config.getDefaultServerCapabilities() == null || config.getDefaultServerCapabilities().isEmpty())
             return ServerCapability.getImplemented(starttlsType);
         return config.getDefaultServerCapabilities();

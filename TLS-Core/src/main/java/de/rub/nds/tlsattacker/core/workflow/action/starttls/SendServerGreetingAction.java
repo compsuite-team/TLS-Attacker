@@ -7,21 +7,17 @@
  * Licensed under Apache License 2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.rub.nds.tlsattacker.core.workflow.action;
+package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.ServerCapability;
-import de.rub.nds.tlsattacker.core.constants.StarttlsType;
-import de.rub.nds.tlsattacker.core.exceptions.WorkflowExecutionException;
-import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
-import de.rub.nds.tlsattacker.core.workflow.action.executor.ActionOption;
 import de.rub.nds.tlsattacker.core.workflow.chooser.Chooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SendServerGreetingAction extends SendStarttlsAsciiAction {
 
@@ -49,21 +45,18 @@ public class SendServerGreetingAction extends SendStarttlsAsciiAction {
                 boolean isCapaInGreeting = chooser.getConfig().getIMAPCapaInGreeting();
                 if (isPreauth)
                     builder.append("* PREAUTH");
-                else {
+                else
                     builder.append("* OK");
-                    if (isCapaInGreeting) {
-                        // TODO: DefaultServerCapabilities from Factory
-                        List<ServerCapability> capabilities = chooser.getConfig().getDefaultServerCapabilities();
-                        if (capabilities != null && !capabilities.isEmpty()) {
-                            builder.append(" [");
-                            for (ServerCapability capa : capabilities) {
-                                builder.append(" " + capa.getServerCapability());
-                            }
-                            builder.append(" ]");
-                        }
+                if (isCapaInGreeting) {
+                    // TODO: DefaultServerCapabilities from Factory
+                    List<ServerCapability> capabilities = chooser.getConfig().getDefaultServerCapabilities();
+                    if (capabilities != null && !capabilities.isEmpty()) {
+                        builder.append(" [");
+                        builder.append(String.join(" ", capabilities.stream().map(x -> x.getServerCapability()).collect(Collectors.toList())));
+                        builder.append("]");
                     }
                 }
-                builder.append("\r\n");
+                builder.append(" ok\r\n");
                 break;
             }
             case POP3:

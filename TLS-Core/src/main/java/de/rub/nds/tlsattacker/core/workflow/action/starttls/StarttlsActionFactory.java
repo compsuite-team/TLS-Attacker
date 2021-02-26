@@ -7,10 +7,13 @@
  * Licensed under Apache License 2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-package de.rub.nds.tlsattacker.core.workflow.action;
+package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.AliasedConnection;
+import de.rub.nds.tlsattacker.core.workflow.action.AsciiAction;
+import de.rub.nds.tlsattacker.core.workflow.action.GenericReceiveAsciiAction;
+import de.rub.nds.tlsattacker.core.workflow.action.SendAsciiAction;
 import de.rub.nds.tlsattacker.transport.ConnectionEndType;
 
 public class StarttlsActionFactory {
