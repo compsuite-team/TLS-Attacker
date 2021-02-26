@@ -14,7 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public enum ServerCapability {
-    IMAP_IMAP4rev1("IMAP4rev1"),
+    IMAP_CAPABILITY("CAPABILITY"),
+    IMAP_IMAP4rev1("IMAP4REV1"),
     IMAP_AUTHPLAIN("AUTH=PLAIN"),
     IMAP_AUTHLOGIN("AUTH=LOGIN"),
     IMAP_LOGINDISABLED("LOGINDISABLED"),
@@ -58,6 +59,7 @@ public enum ServerCapability {
         List<ServerCapability> list = new LinkedList<ServerCapability>();
         switch (type) {
             case IMAP:
+                list.add(IMAP_CAPABILITY);
                 list.add(IMAP_IMAP4rev1);
                 list.add(IMAP_AUTHPLAIN);
                 list.add(IMAP_AUTHLOGIN);
@@ -99,6 +101,10 @@ public enum ServerCapability {
 
     public static boolean isStarttlsCommand(ServerCapability capa) {
         return capa == SMTP_STARTTLS || capa == IMAP_STARTTLS || capa == POP3_STLS;
+    }
+
+    public static boolean isPlainLogin(ServerCapability capa) {
+        return getPlainLogin().contains(capa);
     }
 
     public static boolean offersPlainLogin(StarttlsType type, String serverCapability) {
