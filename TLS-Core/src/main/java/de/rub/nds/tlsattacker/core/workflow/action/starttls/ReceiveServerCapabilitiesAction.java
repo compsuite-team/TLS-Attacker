@@ -44,9 +44,6 @@ public class ReceiveServerCapabilitiesAction extends ReceiveStarttlsAsciiAction 
         // space and new
         // Line.
         List<ServerCapability> capabilities = new LinkedList<ServerCapability>();
-        // TODO: Überprüfung einbauen, ob Nachricht korrekt aufgebaut ist.
-        // TODO: Rufe Methode in Enum ServerCapabilities auf, welche abhängig
-        // vom StarttlsType das passend Enum zum String liefert.
         for (String str : parts) {
             ServerCapability capa = ServerCapability.getCapabilityFromString(getType(), str);
             if (capa != null)

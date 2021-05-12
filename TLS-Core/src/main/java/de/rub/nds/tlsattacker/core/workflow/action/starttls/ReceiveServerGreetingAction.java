@@ -42,11 +42,9 @@ public class ReceiveServerGreetingAction extends ReceiveStarttlsAsciiAction {
     @Override
     public void handleText(TlsContext tlsContext) {
         String[] parts = getAsciiText().split(" ");
-        // TODO: Wird überprüfung von SMTP und POP3 Greeting benötigt?
-        if (getType() == StarttlsType.IMAP) { // TOOO: Wird Preauth im
-            // Context benötigt? if
-            // ("PREAUTH".equals(parts[1]))
-            tlsContext.setIsPreauth(true);
+        if (getType() == StarttlsType.IMAP) { 
+            if ("PREAUTH".equals(parts[1]))
+                tlsContext.setIsPreauth(true);
             if (parts.length >= 2 && parts[2] != null && parts[2].startsWith("[")) {
                 tlsContext.setCapaInGreeting(true);
                 List<ServerCapability> capabilities = new LinkedList<ServerCapability>();
