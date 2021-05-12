@@ -12,6 +12,7 @@ package de.rub.nds.tlsattacker.core.config.delegate;
 import com.beust.jcommander.Parameter;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.config.converters.StarttlsTypeConverter;
+import de.rub.nds.tlsattacker.core.constants.ServerCapability;
 import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.exceptions.ConfigurationException;
 
@@ -58,6 +59,10 @@ public class StarttlsDelegate extends Delegate {
     @Override
     public void applyDelegate(Config config) throws ConfigurationException {
         config.setStarttlsType(starttlsType);
+        if (starttlsType != StarttlsType.NONE) {
+            // config.setServerSendsApplicationData(true);
+            config.setDefaultServerCapabilities(ServerCapability.getImplemented(starttlsType));
+        }
         config.setPlainUser(plainUser);
         config.setPlainPwd(plainPwd);
     }

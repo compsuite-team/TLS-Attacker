@@ -24,11 +24,8 @@ public class StarttlsActionFactory {
 
     public static AsciiAction createIssueStarttlsCommandAction(Config tlsConfig, AliasedConnection connection,
             ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
-        StarttlsMessageFactory factory = new StarttlsMessageFactory(tlsConfig);
-        String message;
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
-            message = factory.createSendCommand(commandType);
             action = new SendStarttlsResponseAction(encoding, tlsConfig);
         } else {
             action = new ReceiveStarttlsResponseAction(encoding);
