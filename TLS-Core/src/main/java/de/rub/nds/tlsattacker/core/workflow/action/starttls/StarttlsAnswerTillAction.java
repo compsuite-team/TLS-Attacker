@@ -72,12 +72,13 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                 byte[] fetchData = tlsContext.getTransportHandler().fetchData();
 
                 String receivedMessage = new String(fetchData, getEncoding());
-                if (receivedMessage == null || receivedMessage.isEmpty())
+                if (receivedMessage == null || receivedMessage.isEmpty()) {
                     break;
+                }
 
                 receivedMessages.add(receivedMessage);
 
-                if (receivedMessage.contains(expectedMessage)) {
+                if (receivedCmd(receivedMessage, expectedMessage)) {
                     if (starttlsType == StarttlsType.IMAP)
                         tlsContext.setRecentIMAPTag(receivedMessage.split(" ")[0]);
                     setExecuted(true);
@@ -94,41 +95,41 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                         case IMAP: {
                             String IMAPTag = receivedMessage.split(" ")[0];
                             tlsContext.setRecentIMAPTag(IMAPTag);
-                            if (receivedMessage.contains("NOOP"))
+                            if (receivedCmd(receivedMessage, "NOOP"))
                                 answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_OK, IMAPTag);
-                            else if (receivedMessage.contains("CAPABILITY"))
+                            else if (receivedCmd(receivedMessage, "CAPABILITY"))
                                 answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_CAPA, IMAPTag);
-                            else if (receivedMessage.contains("LOGOUT")) {
+                            else if (receivedCmd(receivedMessage, "LOGOUT"))
                                 answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_BYE, IMAPTag);
-                                // TODO: Terminate connection.
-                            } else
-                                setUnexpectedMessage(true);
+                            else if (!receivedMessage.isEmpty())
+                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_ERR);
                             break;
                         }
                         case POP3: {
-                            if (receivedMessage.contains("CAPA"))
+                            if (receivedCmd(receivedMessage, "CAPA"))
                                 answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CAPA);
-                            if (receivedMessage.contains("QUIT"))
+                            else if (receivedCmd(receivedMessage, "QUIT"))
                                 answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_BYE);
-                            else
-                                setUnexpectedMessage(true);
-                            // TODO: Terminate connection.
+                            else if (!receivedMessage.isEmpty())
+                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_ERR);
                             break;
                         }
                         case SMTP: {
-                            if (receivedMessage.contains("NOOP"))
+                            if (receivedCmd(receivedMessage, "NOOP"))
                                 answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_OK);
-                            if (receivedMessage.contains("EHLO") && !"EHLO".equals(expectedMessage))
+                            else if ((receivedCmd(receivedMessage, "EHLO")) && !"EHLO".equals(expectedMessage))
                                 answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CAPA);
-                            if (receivedMessage.contains("QUIT"))
+                            else if (receivedCmd(receivedMessage, "QUIT"))
                                 answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_BYE);
-                            setUnexpectedMessage(true);
-                            // TODO: Terminate connection.
+                            else if (!receivedMessage.isEmpty())
+                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_ERR);
                             break;
                         }
                     }
-                    LOGGER.debug("Responding: " + answer);
-                    tlsContext.getTransportHandler().sendData(answer.getBytes(getEncoding()));
+                    if (!answer.isEmpty()) {
+                        LOGGER.debug("Responding: " + answer);
+                        tlsContext.getTransportHandler().sendData(answer.getBytes(getEncoding()));
+                    }
                 }
             }
             setAsciiText(String.join("", receivedMessages));
@@ -145,12 +146,9 @@ public class StarttlsAnswerTillAction extends AsciiAction {
 
     }
 
-    public void setUnexpectedMessage(boolean unexpectedMessage) {
-        this.unexpectedMessage = unexpectedMessage;
-    }
-
-    public boolean ReceivedUnexpectedMessage() {
-        return unexpectedMessage;
+    private boolean receivedCmd(String receivedMessage, String cmd) {
+        String toCompare = receivedMessage.toUpperCase();
+        return toCompare.contains(cmd);
     }
 
     public List<String> getReceivedMessages() {
