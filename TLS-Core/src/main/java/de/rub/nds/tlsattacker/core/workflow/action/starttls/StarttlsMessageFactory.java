@@ -29,7 +29,6 @@ public class StarttlsMessageFactory {
     private StarttlsMessageFactory() {
     }
 
-    // TODO:Split createCommand in Send & Receive
     public String createSendCommand(CommandType commandType) {
         return createCommand(commandType, "abc");
     }
@@ -39,15 +38,13 @@ public class StarttlsMessageFactory {
     }
 
     public String createCommand(CommandType commandType, String tag) {
-        // TODO: How to handle empty capabilities?
-        // TODO: How to handle empty
         String IMAPTag = tag;
         if (!"".equals(IMAPTag))
             IMAPTag = IMAPTag + " ";
         switch (starttlsType) {
             case IMAP: {
                 StringBuilder builder = new StringBuilder();
-                for (ServerCapability capa : getDefaultCapabilities()) {
+                for (ServerCapability capa : config.getDefaultServerCapabilities()) {
                     if (!(commandType == CommandType.S_CAPA && capa == ServerCapability.IMAP_CAPABILITY))
                         builder.append(" " + capa.getServerCapability());
                 }
@@ -61,15 +58,15 @@ public class StarttlsMessageFactory {
                     case C_STARTTLS:
                         return IMAPTag + "STARTTLS\r\n";
                     case S_STARTTLS:
-                        return IMAPTag + "OK Begin TLS negotiation\r\n";// "OK let's talk TLS"
+                        return IMAPTag + "OK Begin TLS negotiation\r\n";
                     case S_OK:
-                        return IMAPTag + "OK\r\n";
+                        return IMAPTag + "OK done\r\n";
                     case C_NOOP:
                         return IMAPTag + "NOOP\r\n";
                     case C_QUIT:
                         return IMAPTag + "LOGOUT\r\n";
                     case S_BYE:
-                        return "* BYE\r\n" + IMAPTag + "OK\r\n";
+                        return "* BYE\r\n" + IMAPTag + "OK done\r\n";
                 }
             }
             case POP3: {
@@ -81,7 +78,7 @@ public class StarttlsMessageFactory {
                     case S_CAPA:
                         StringBuilder builder = new StringBuilder();
                         builder.append("+OK");
-                        for (ServerCapability capa : getDefaultCapabilities()) {
+                        for (ServerCapability capa : config.getDefaultServerCapabilities()) {
                             builder.append("\r\n" + capa.getServerCapability());
                         }
                         builder.append("\r\n.\r\n");
@@ -95,6 +92,8 @@ public class StarttlsMessageFactory {
                     case S_OK:
                     case S_BYE:
                         return "+OK\r\n";
+                    case S_ERR:
+                        return "-ERR\r\n";
                 }
 
             }
@@ -105,14 +104,15 @@ public class StarttlsMessageFactory {
                     case C_CAPA:
                         return "EHLO mail.example.com\r\n";
                     case S_CAPA:
-                        List<ServerCapability> capabilities = getDefaultCapabilities();
+                        List<ServerCapability> capabilities = config.getDefaultServerCapabilities();
                         StringBuilder builder = new StringBuilder();
                         builder.append("250-mail.example.org\r\n");
                         if (!capabilities.isEmpty()) {
                             for (int i = 0; i < capabilities.size() - 1; i++) {
-                                builder.append("250-" + capabilities.get(i) + "\r\n");
+                                builder.append("250-" + capabilities.get(i).getServerCapability() + "\r\n");
                             }
-                            builder.append("250 " + capabilities.get(capabilities.size() - 1) + "\r\n");
+                            builder.append("250 " + capabilities.get(capabilities.size() - 1).getServerCapability()
+                                    + "\r\n");
                         }
                         return builder.toString();
                     case C_STARTTLS:
@@ -142,12 +142,16 @@ public class StarttlsMessageFactory {
                         return "CAPABILITY";
                     case C_STARTTLS:
                         return "STARTTLS";
+                    case C_QUIT:
+                        return "LOGOUT";
                 }
             }
             case POP3:
                 switch (commandType) {
                     case C_STARTTLS:
                         return "STLS";
+                    case C_QUIT:
+                        return "QUIT";
                 }
 
             case SMTP:
@@ -156,15 +160,11 @@ public class StarttlsMessageFactory {
                         return "EHLO";
                     case C_STARTTLS:
                         return "STARTTLS";
+                    case C_QUIT:
+                        return "QUIT";
                 }
         }
         return null;
-    }
-
-    public List<ServerCapability> getDefaultCapabilities() {
-        if (config.getDefaultServerCapabilities() == null || config.getDefaultServerCapabilities().isEmpty())
-            return ServerCapability.getImplemented(starttlsType);
-        return config.getDefaultServerCapabilities();
     }
 
     public enum CommandType {
@@ -176,6 +176,7 @@ public class StarttlsMessageFactory {
         C_NOOP,
         S_OK,
         C_QUIT,
-        S_BYE
+        S_BYE,
+        S_ERR
     }
 }
