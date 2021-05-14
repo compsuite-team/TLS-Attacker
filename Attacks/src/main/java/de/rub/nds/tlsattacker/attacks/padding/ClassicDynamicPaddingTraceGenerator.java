@@ -15,6 +15,7 @@ import de.rub.nds.tlsattacker.attacks.constants.PaddingRecordGeneratorType;
 import de.rub.nds.tlsattacker.attacks.padding.vector.PaddingVector;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.RunningModeType;
+import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.protocol.message.ApplicationMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.CertificateMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.ChangeCipherSpecMessage;
@@ -68,7 +69,10 @@ public class ClassicDynamicPaddingTraceGenerator extends PaddingTraceGenerator {
                 trace.addTlsAction(new ReceiveTillAction(new ServerHelloDoneMessage()));
                 trace.addTlsAction(new SendDynamicClientKeyExchangeAction());
                 trace.addTlsAction(new SendAction(new ChangeCipherSpecMessage(), new FinishedMessage()));
-                trace.addTlsAction(new ReceiveAction(new ChangeCipherSpecMessage(), new FinishedMessage()));
+                ApplicationMessage appl = new ApplicationMessage();
+                appl.setRequired(false);
+                trace.addTlsAction(new ReceiveAction(new ChangeCipherSpecMessage(), new FinishedMessage(),
+                        appl));
                 trace.addTlsAction(sendAction);
                 trace.addTlsAction(new GenericReceiveAction());
                 break;
