@@ -71,8 +71,7 @@ public class ClassicDynamicPaddingTraceGenerator extends PaddingTraceGenerator {
                 trace.addTlsAction(new SendAction(new ChangeCipherSpecMessage(), new FinishedMessage()));
                 ApplicationMessage appl = new ApplicationMessage();
                 appl.setRequired(false);
-                trace.addTlsAction(new ReceiveAction(new ChangeCipherSpecMessage(), new FinishedMessage(),
-                        appl));
+                trace.addTlsAction(new ReceiveAction(new ChangeCipherSpecMessage(), new FinishedMessage(), appl));
                 trace.addTlsAction(sendAction);
                 trace.addTlsAction(new GenericReceiveAction());
                 break;
