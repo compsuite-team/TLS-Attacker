@@ -67,7 +67,10 @@ public class StarttlsMessageFactory {
                         return IMAPTag + "LOGOUT\r\n";
                     case S_BYE:
                         return "* BYE\r\n" + IMAPTag + "OK done\r\n";
+                    case S_ERR:
+                        return "* BAD command not implemented\r\n";
                 }
+                break;
             }
             case POP3: {
                 switch (commandType) {
@@ -95,7 +98,7 @@ public class StarttlsMessageFactory {
                     case S_ERR:
                         return "-ERR\r\n";
                 }
-
+                break;
             }
             case SMTP: {
                 switch (commandType) {
@@ -127,8 +130,10 @@ public class StarttlsMessageFactory {
                         return "QUIT\r\n";
                     case S_BYE:
                         return "221 OK\r\n";
+                    case S_ERR:
+                        return "504 command not implemented\r\n";
                 }
-
+                break;
             }
         }
         return "";
