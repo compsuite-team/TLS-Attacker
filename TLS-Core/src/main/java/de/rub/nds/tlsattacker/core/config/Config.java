@@ -10,7 +10,6 @@
 package de.rub.nds.tlsattacker.core.config;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
-import de.rub.nds.modifiablevariable.util.ByteArrayAdapter;
 import de.rub.nds.modifiablevariable.util.UnformattedByteArrayAdapter;
 import de.rub.nds.tlsattacker.core.certificate.CertificateKeyPair;
 import de.rub.nds.tlsattacker.core.connection.InboundConnection;

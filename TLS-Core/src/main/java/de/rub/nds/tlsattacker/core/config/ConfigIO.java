@@ -9,7 +9,6 @@
  */
 package de.rub.nds.tlsattacker.core.config;
 
-import de.rub.nds.modifiablevariable.util.XMLPrettyPrinter;
 import de.rub.nds.tlsattacker.core.config.filter.ConfigDisplayFilter;
 import java.io.*;
 import javax.xml.bind.JAXB;
@@ -33,9 +32,8 @@ public class ConfigIO {
 
         JAXB.marshal(config, tempStream);
         try {
-            os.write(XMLPrettyPrinter.prettyPrintXML(new String(tempStream.toByteArray())).getBytes());
-        } catch (IOException | TransformerException | XPathExpressionException | ParserConfigurationException
-                | SAXException ex) {
+            os.write(new String(tempStream.toByteArray()).getBytes());
+        } catch (IOException ex) {
             throw new RuntimeException("Could not format XML");
         }
     }

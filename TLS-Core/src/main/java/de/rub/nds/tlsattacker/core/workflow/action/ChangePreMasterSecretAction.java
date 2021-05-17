@@ -10,7 +10,7 @@
 package de.rub.nds.tlsattacker.core.workflow.action;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
-import de.rub.nds.modifiablevariable.util.ByteArrayAdapter;
+import de.rub.nds.modifiablevariable.util.UnformattedByteArrayAdapter;
 import de.rub.nds.tlsattacker.core.exceptions.WorkflowExecutionException;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
@@ -23,9 +23,9 @@ public class ChangePreMasterSecretAction extends ConnectionBoundAction {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @XmlJavaTypeAdapter(ByteArrayAdapter.class)
+    @XmlJavaTypeAdapter(UnformattedByteArrayAdapter.class)
     private byte[] newValue = null;
-    @XmlJavaTypeAdapter(ByteArrayAdapter.class)
+    @XmlJavaTypeAdapter(UnformattedByteArrayAdapter.class)
     private byte[] oldValue = null;
 
     public ChangePreMasterSecretAction(byte[] newValue) {

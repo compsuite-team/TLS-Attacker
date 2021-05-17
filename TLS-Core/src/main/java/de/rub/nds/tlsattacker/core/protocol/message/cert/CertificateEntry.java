@@ -9,7 +9,7 @@
  */
 package de.rub.nds.tlsattacker.core.protocol.message.cert;
 
-import de.rub.nds.modifiablevariable.util.ByteArrayAdapter;
+import de.rub.nds.modifiablevariable.util.UnformattedByteArrayAdapter;
 import de.rub.nds.tlsattacker.core.protocol.message.extension.ExtensionMessage;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CertificateEntry {
 
-    @XmlJavaTypeAdapter(ByteArrayAdapter.class)
+    @XmlJavaTypeAdapter(UnformattedByteArrayAdapter.class)
     private byte[] certificate;
 
     private List<ExtensionMessage> extensions;
