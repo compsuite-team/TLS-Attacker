@@ -12,6 +12,7 @@ package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.exceptions.WorkflowExecutionException;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsCommandType;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.action.AsciiAction;
@@ -23,32 +24,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StarttlsAnswerTillAction extends AsciiAction {
+public class StarttlsAnswerTillAction extends StarttlsAsciiAction {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private String expectedMessage;
-
-    private StarttlsType starttlsType;
-
-    private StarttlsMessageFactory factory;
+    private StarttlsCommandType expectedMessage;
 
     private List<String> receivedMessages;
-
-    @XmlTransient
-    private boolean unexpectedMessage;
 
     public StarttlsAnswerTillAction() {
         super();
     }
 
-    public StarttlsAnswerTillAction(Config config, String expectedMessage, String encoding) {
-        super(encoding);
+    public StarttlsAnswerTillAction(Config config, StarttlsCommandType expectedMessage, String encoding) {
+        super(encoding, config);
         this.expectedMessage = expectedMessage;
-        this.starttlsType = config.getStarttlsType();
-        this.factory = new StarttlsMessageFactory(config);
         receivedMessages = new ArrayList<String>();
-        unexpectedMessage = false;
     }
 
     /**
@@ -75,12 +66,12 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                 if (receivedMessage == null || receivedMessage.isEmpty()) {
                     break;
                 }
-
                 receivedMessages.add(receivedMessage);
 
+                if (getType() == StarttlsType.IMAP)
+                    tlsContext.setRecentIMAPTag(receivedMessage.split(" ")[0]);
+
                 if (receivedCmd(receivedMessage, expectedMessage)) {
-                    if (starttlsType == StarttlsType.IMAP)
-                        tlsContext.setRecentIMAPTag(receivedMessage.split(" ")[0]);
                     setExecuted(true);
                     break;
                 }
@@ -88,48 +79,15 @@ public class StarttlsAnswerTillAction extends AsciiAction {
                 else {
 
                     String answer = "";
+                    for (StarttlsCommandType type : getHandler().expectedCommandsDict().keySet()) {
+                        if (receivedCmd(receivedMessage, type))
+                            answer = getHandler().createCommand(tlsContext, getHandler().CommandsResponses().get(type));
+                    }
+                    if (answer.isEmpty())
+                        answer = getHandler().createCommand(tlsContext, StarttlsCommandType.S_ERR);
                     // Answer to specific protocol commands.
-                    switch (starttlsType) {
-                        case FTP:
-                            break;
-                        case IMAP: {
-                            String IMAPTag = receivedMessage.split(" ")[0];
-                            tlsContext.setRecentIMAPTag(IMAPTag);
-                            if (receivedCmd(receivedMessage, "NOOP"))
-                                answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_OK, IMAPTag);
-                            else if (receivedCmd(receivedMessage, "CAPABILITY"))
-                                answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_CAPA, IMAPTag);
-                            else if (receivedCmd(receivedMessage, "LOGOUT"))
-                                answer = factory.createCommand(StarttlsMessageFactory.CommandType.S_BYE, IMAPTag);
-                            else if (!receivedMessage.isEmpty())
-                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_ERR);
-                            break;
-                        }
-                        case POP3: {
-                            if (receivedCmd(receivedMessage, "CAPA"))
-                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CAPA);
-                            else if (receivedCmd(receivedMessage, "QUIT"))
-                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_BYE);
-                            else if (!receivedMessage.isEmpty())
-                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_ERR);
-                            break;
-                        }
-                        case SMTP: {
-                            if (receivedCmd(receivedMessage, "NOOP"))
-                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_OK);
-                            else if ((receivedCmd(receivedMessage, "EHLO")) && !"EHLO".equals(expectedMessage))
-                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CAPA);
-                            else if (receivedCmd(receivedMessage, "QUIT"))
-                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_BYE);
-                            else if (!receivedMessage.isEmpty())
-                                answer = factory.createSendCommand(StarttlsMessageFactory.CommandType.S_ERR);
-                            break;
-                        }
-                    }
-                    if (!answer.isEmpty()) {
-                        LOGGER.debug("Responding: " + answer);
-                        tlsContext.getTransportHandler().sendData(answer.getBytes(getEncoding()));
-                    }
+                    LOGGER.debug("Responding: " + answer);
+                    tlsContext.getTransportHandler().sendData(answer.getBytes(getEncoding()));
                 }
             }
             setAsciiText(String.join("", receivedMessages));
@@ -146,7 +104,8 @@ public class StarttlsAnswerTillAction extends AsciiAction {
 
     }
 
-    private boolean receivedCmd(String receivedMessage, String cmd) {
+    private boolean receivedCmd(String receivedMessage, StarttlsCommandType commandType) {
+        String cmd = getHandler().expectedCommandsDict().get(commandType);
         String toCompare = receivedMessage.toUpperCase();
         return toCompare.contains(cmd);
     }
@@ -158,5 +117,11 @@ public class StarttlsAnswerTillAction extends AsciiAction {
     @Override
     public boolean executedAsPlanned() {
         return isExecuted();
+    }
+
+    @Override
+    public String getActionInfo() {
+        return "StarttlsAnswerTillAction: Communicating until client issues \""
+                + getHandler().expectedCommandsDict().get(expectedMessage) + "\"";
     }
 }

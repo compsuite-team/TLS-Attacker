@@ -404,7 +404,7 @@ public class WorkflowConfigurationFactoryTest {
         WorkflowTrace workflowTrace = workflowConfigurationFactory.createWorkflowTrace(WorkflowTraceType.HELLO,
                 RunningModeType.CLIENT);
         Assert.assertEquals(ReceiveServerGreetingAction.class, workflowTrace.getTlsActions().get(0).getClass());
-        Assert.assertEquals(SendAsciiAction.class, workflowTrace.getTlsActions().get(1).getClass());
+        Assert.assertEquals(SendStarttlsAsciiAction.class, workflowTrace.getTlsActions().get(1).getClass());
         Assert.assertEquals(ReceiveStarttlsResponseAction.class, workflowTrace.getTlsActions().get(2).getClass());
 
         workflowTrace = workflowConfigurationFactory.createWorkflowTrace(WorkflowTraceType.HELLO,
@@ -419,7 +419,7 @@ public class WorkflowConfigurationFactoryTest {
         workflowTrace = workflowConfigurationFactory.createWorkflowTrace(WorkflowTraceType.HELLO,
                 RunningModeType.CLIENT);
         Assert.assertEquals(ReceiveServerGreetingAction.class, workflowTrace.getTlsActions().get(0).getClass());
-        Assert.assertEquals(SendAsciiAction.class, workflowTrace.getTlsActions().get(1).getClass());
+        Assert.assertEquals(SendStarttlsAsciiAction.class, workflowTrace.getTlsActions().get(1).getClass());
         Assert.assertEquals(ReceiveStarttlsResponseAction.class, workflowTrace.getTlsActions().get(2).getClass());
 
         workflowTrace = workflowConfigurationFactory.createWorkflowTrace(WorkflowTraceType.HELLO,
@@ -434,9 +434,9 @@ public class WorkflowConfigurationFactoryTest {
         workflowTrace = workflowConfigurationFactory.createWorkflowTrace(WorkflowTraceType.HELLO,
                 RunningModeType.CLIENT);
         Assert.assertEquals(ReceiveServerGreetingAction.class, workflowTrace.getTlsActions().get(0).getClass());
-        Assert.assertEquals(SendAsciiAction.class, workflowTrace.getTlsActions().get(1).getClass());
+        Assert.assertEquals(SendStarttlsAsciiAction.class, workflowTrace.getTlsActions().get(1).getClass());
         Assert.assertEquals(ReceiveServerCapabilitiesAction.class, workflowTrace.getTlsActions().get(2).getClass());
-        Assert.assertEquals(SendAsciiAction.class, workflowTrace.getTlsActions().get(3).getClass());
+        Assert.assertEquals(SendStarttlsAsciiAction.class, workflowTrace.getTlsActions().get(3).getClass());
         Assert.assertEquals(ReceiveStarttlsResponseAction.class, workflowTrace.getTlsActions().get(4).getClass());
 
         workflowTrace = workflowConfigurationFactory.createWorkflowTrace(WorkflowTraceType.HELLO,

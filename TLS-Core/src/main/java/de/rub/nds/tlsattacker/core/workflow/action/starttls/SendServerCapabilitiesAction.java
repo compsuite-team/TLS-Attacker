@@ -10,6 +10,7 @@
 package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsCommandType;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.chooser.Chooser;
 import org.apache.logging.log4j.LogManager;
@@ -20,32 +21,15 @@ public class SendServerCapabilitiesAction extends SendStarttlsAsciiAction {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public SendServerCapabilitiesAction() {
-        super();
+        super(StarttlsCommandType.S_CAPA);
     }
 
     public SendServerCapabilitiesAction(Config config) {
-        super(config);
+        super(config, StarttlsCommandType.S_CAPA);
     }
 
     public SendServerCapabilitiesAction(String encoding, Config config) {
-        super(encoding, config);
-    }
-
-    @Override
-    public String initAsciiText(TlsContext tlsContext) {
-        Chooser chooser = tlsContext.getChooser();
-        StarttlsMessageFactory factory = new StarttlsMessageFactory(getConfig());
-        return factory.createCommand(StarttlsMessageFactory.CommandType.S_CAPA, tlsContext.getRecentIMAPTag());
-    }
-
-    @Override
-    public void reset() {
-        setExecuted(null);
-    }
-
-    @Override
-    public boolean executedAsPlanned() {
-        return isExecuted();
+        super(encoding, config, StarttlsCommandType.S_CAPA);
     }
 
     @Override

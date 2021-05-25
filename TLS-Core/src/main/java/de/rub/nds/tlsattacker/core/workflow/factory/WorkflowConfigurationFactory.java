@@ -25,10 +25,10 @@ import de.rub.nds.tlsattacker.core.protocol.message.extension.EarlyDataExtension
 import de.rub.nds.tlsattacker.core.protocol.message.extension.ExtensionMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.extension.PreSharedKeyExtensionMessage;
 import de.rub.nds.tlsattacker.core.record.BlobRecord;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsProtocolFactory;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsProtocolHandler;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
 import de.rub.nds.tlsattacker.core.workflow.action.*;
-import de.rub.nds.tlsattacker.core.workflow.action.starttls.StarttlsActionFactory;
-import de.rub.nds.tlsattacker.core.workflow.action.starttls.StarttlsMessageFactory;
 import de.rub.nds.tlsattacker.transport.ConnectionEndType;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -92,6 +92,8 @@ public class WorkflowConfigurationFactory {
                 return createDynamicHelloWorkflow();
             case DYNAMIC_HTTPS:
                 return createHttpsDynamicWorkflow();
+            case DYNAMIC_FULL:
+                return createDynamicFullWorkflow();
         }
         throw new ConfigurationException("Unknown WorkflowTraceType " + type.name());
     }
@@ -797,42 +799,8 @@ public class WorkflowConfigurationFactory {
     }
 
     public WorkflowTrace addStartTlsActions(AliasedConnection connection, StarttlsType type, WorkflowTrace workflowTrace) {
-        switch (type) {
-        // TODO: Implement for FTP
-            case IMAP: {
-                // TODO: IMAPTAG überarbeiten
-                workflowTrace.addTlsAction(StarttlsActionFactory.createServerGreetingAction(config, connection,
-                        ConnectionEndType.SERVER, "US-ASCII"));
-                workflowTrace.addTlsAction(StarttlsActionFactory.createStarttlsCommunicationAction(config, connection,
-                        ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_STARTTLS, "US-ASCII"));
-                workflowTrace.addTlsAction(StarttlsActionFactory.createIssueStarttlsCommandAction(config, connection,
-                        ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_STARTTLS, "US-ASCII"));
-                return workflowTrace;
-            }
-            case POP3: {
-                workflowTrace.addTlsAction(StarttlsActionFactory.createServerGreetingAction(config, connection,
-                        ConnectionEndType.SERVER, "US-ASCII"));
-                workflowTrace.addTlsAction(StarttlsActionFactory.createStarttlsCommunicationAction(config, connection,
-                        ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_STARTTLS, "US-ASCII"));
-                workflowTrace.addTlsAction(StarttlsActionFactory.createIssueStarttlsCommandAction(config, connection,
-                        ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_STARTTLS, "US-ASCII"));
-                return workflowTrace;
-            }
-            case SMTP: {
-                workflowTrace.addTlsAction(StarttlsActionFactory.createServerGreetingAction(config, connection,
-                        ConnectionEndType.SERVER, "US-ASCII"));
-                workflowTrace.addTlsAction(StarttlsActionFactory.createStarttlsCommunicationAction(config, connection,
-                        ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_CAPA, "US-ASCII"));
-                workflowTrace.addTlsAction(StarttlsActionFactory.createServerCapabilitiesAction(config, connection,
-                        ConnectionEndType.SERVER, "US-ASCII"));
-                workflowTrace.addTlsAction(StarttlsActionFactory.createStarttlsCommunicationAction(config, connection,
-                        ConnectionEndType.CLIENT, StarttlsMessageFactory.CommandType.C_STARTTLS, "US-ASCII"));
-                workflowTrace.addTlsAction(StarttlsActionFactory.createIssueStarttlsCommandAction(config, connection,
-                        ConnectionEndType.SERVER, StarttlsMessageFactory.CommandType.S_STARTTLS, "US-ASCII"));
-                return workflowTrace;
-            }
-        }
-        return workflowTrace;
+        StarttlsProtocolHandler handler = StarttlsProtocolFactory.getProtocol(type);
+        return handler.extendWorkflowTrace(connection, config, workflowTrace);
     }
 
     private WorkflowTrace createDynamicHandshakeWorkflow() {
@@ -893,6 +861,27 @@ public class WorkflowConfigurationFactory {
             }
         }
         return trace;
+    }
+
+    private WorkflowTrace createDynamicFullWorkflow() {
+        AliasedConnection connection = getConnection();
+        WorkflowTrace workflowTrace = createDynamicHandshakeWorkflow();
+
+        if (config.isServerSendsApplicationData()) {
+            workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection, ConnectionEndType.SERVER,
+                    new ApplicationMessage(config)));
+        }
+
+        if (config.isAddHeartbeatExtension()) {
+            workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection, ConnectionEndType.CLIENT,
+                    new ApplicationMessage(config), new HeartbeatMessage(config)));
+            workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection, ConnectionEndType.SERVER,
+                    new HeartbeatMessage(config)));
+        } else {
+            workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection, ConnectionEndType.CLIENT,
+                    new ApplicationMessage(config)));
+        }
+        return workflowTrace;
     }
 
     private WorkflowTrace createDynamicHelloWorkflow() {

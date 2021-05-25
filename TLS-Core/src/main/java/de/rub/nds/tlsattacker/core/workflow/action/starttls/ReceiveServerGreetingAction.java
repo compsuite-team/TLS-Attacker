@@ -41,26 +41,7 @@ public class ReceiveServerGreetingAction extends ReceiveStarttlsAsciiAction {
 
     @Override
     public void handleText(TlsContext tlsContext) {
-        String[] parts = getAsciiText().split(" ");
-        if (getType() == StarttlsType.IMAP) { 
-            if ("PREAUTH".equals(parts[1]))
-                tlsContext.setIsPreauth(true);
-            if (parts.length >= 2 && parts[2] != null && parts[2].startsWith("[")) {
-                tlsContext.setCapaInGreeting(true);
-                List<ServerCapability> capabilities = new LinkedList<ServerCapability>();
-                for (int i = 2; i < parts.length; i++) {
-                    String capability = parts[i];
-                    if (capability.startsWith("["))
-                        capability = capability.substring(1);
-                    if (capability.endsWith("]"))
-                        capability = capability.substring(0, capability.length() - 1);
-                    ServerCapability capa = ServerCapability.getCapabilityFromString(getType(), capability);
-                    if (capa != null)
-                        capabilities.add(capa);
-                }
-                tlsContext.setServerCapabilities(capabilities);
-            }
-        }
+        getHandler().handleServerGreeting(tlsContext, getAsciiText());
     }
 
     @Override

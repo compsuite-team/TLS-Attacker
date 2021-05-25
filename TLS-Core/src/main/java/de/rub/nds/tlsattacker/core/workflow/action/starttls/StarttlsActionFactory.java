@@ -11,6 +11,8 @@ package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.AliasedConnection;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsCommandType;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsProtocolFactory;
 import de.rub.nds.tlsattacker.core.workflow.action.AsciiAction;
 import de.rub.nds.tlsattacker.core.workflow.action.GenericReceiveAsciiAction;
 import de.rub.nds.tlsattacker.core.workflow.action.SendAsciiAction;
@@ -23,7 +25,7 @@ public class StarttlsActionFactory {
     }
 
     public static AsciiAction createIssueStarttlsCommandAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
+            ConnectionEndType sendingConnectionEnd, StarttlsCommandType commandType, String encoding) {
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
             action = new SendStarttlsResponseAction(encoding, tlsConfig);
@@ -34,13 +36,10 @@ public class StarttlsActionFactory {
     }
 
     public static AsciiAction createStarttlsAsciiAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
-        StarttlsMessageFactory factory = new StarttlsMessageFactory(tlsConfig);
-        String message;
+            ConnectionEndType sendingConnectionEnd, StarttlsCommandType commandType, String encoding) {
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
-            message = factory.createSendCommand(commandType);
-            action = new SendAsciiAction(message, encoding);
+            action = new SendStarttlsAsciiAction(encoding, tlsConfig, commandType);
         } else {
             action = new GenericReceiveAsciiAction(encoding);
         }
@@ -48,16 +47,12 @@ public class StarttlsActionFactory {
     }
 
     public static AsciiAction createStarttlsCommunicationAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, StarttlsMessageFactory.CommandType commandType, String encoding) {
-        StarttlsMessageFactory factory = new StarttlsMessageFactory(tlsConfig);
+            ConnectionEndType sendingConnectionEnd, StarttlsCommandType commandType, String encoding) {
         AsciiAction action;
-        String message;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
-            message = factory.createSendCommand(commandType);
-            action = new SendAsciiAction(message, encoding);
+            action = new SendStarttlsAsciiAction(tlsConfig, commandType);
         } else {
-            message = factory.createExpectedCommand(commandType);
-            action = new StarttlsAnswerTillAction(tlsConfig, message, encoding);
+            action = new StarttlsAnswerTillAction(tlsConfig, commandType, encoding);
         }
         return action;
     }

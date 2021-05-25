@@ -12,6 +12,8 @@ package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.exceptions.WorkflowExecutionException;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsProtocolFactory;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsProtocolHandler;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.action.AsciiAction;
@@ -20,40 +22,24 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-public abstract class ReceiveStarttlsAsciiAction extends AsciiAction {
+public abstract class ReceiveStarttlsAsciiAction extends StarttlsAsciiAction {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final Config config;
-
     public ReceiveStarttlsAsciiAction() {
         super();
-        config = null;
     }
 
     public ReceiveStarttlsAsciiAction(Config config) {
-        super();
-        this.config = config;
+        super(config);
     }
 
     public ReceiveStarttlsAsciiAction(String asciiText, String encoding, Config config) {
-        super(asciiText, encoding);
-        this.config = config;
+        super(asciiText, encoding, config);
     }
 
     public ReceiveStarttlsAsciiAction(String encoding, Config config) {
-        super(encoding);
-        this.config = config;
-    }
-
-    /**
-     *
-     * @return the Starttls Type
-     */
-    public StarttlsType getType() {
-        if (config == null)
-            return StarttlsType.NONE;
-        return config.getStarttlsType();
+        super(encoding, config);
     }
 
     @Override
@@ -81,6 +67,4 @@ public abstract class ReceiveStarttlsAsciiAction extends AsciiAction {
     }
 
     public abstract void handleText(TlsContext tlsContext);
-
-    public abstract String getActionInfo();
 }

@@ -31,6 +31,7 @@ import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.layer.RecordLayer;
 import de.rub.nds.tlsattacker.core.record.layer.RecordLayerFactory;
 import de.rub.nds.tlsattacker.core.record.layer.RecordLayerType;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsProtocolFactory;
 import de.rub.nds.tlsattacker.core.state.http.HttpContext;
 import de.rub.nds.tlsattacker.core.workflow.chooser.Chooser;
 import de.rub.nds.tlsattacker.core.workflow.chooser.ChooserFactory;
@@ -694,9 +695,10 @@ public class TlsContext {
     }
 
     public Chooser getChooser() {
-        if (chooser == null) {
-            chooser = ChooserFactory.getChooser(config.getChooserType(), this, config);
+        if (chooser != null) {
+            return chooser;
         }
+        chooser = ChooserFactory.getChooser(config.getChooserType(), this, config);
         return chooser;
     }
 

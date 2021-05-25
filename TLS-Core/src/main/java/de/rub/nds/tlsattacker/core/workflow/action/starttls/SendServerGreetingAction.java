@@ -11,6 +11,7 @@ package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.ServerCapability;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsCommandType;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.chooser.Chooser;
 import org.apache.logging.log4j.LogManager;
@@ -24,57 +25,15 @@ public class SendServerGreetingAction extends SendStarttlsAsciiAction {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public SendServerGreetingAction() {
-        super();
+        super(StarttlsCommandType.S_CONNECTED);
     }
 
     public SendServerGreetingAction(Config config) {
-        super(config);
+        super(config, StarttlsCommandType.S_CONNECTED);
     }
 
     public SendServerGreetingAction(String encoding, Config config) {
-        super(encoding, config);
-    }
-
-    public String initAsciiText(TlsContext tlsContext) {
-        Chooser chooser = tlsContext.getChooser();
-        StarttlsMessageFactory factory = new StarttlsMessageFactory(chooser.getConfig());
-        StringBuilder builder = new StringBuilder();
-        switch (getType()) {
-            case IMAP: {
-                boolean isPreauth = chooser.getConfig().getIMAPPreAuth();
-                boolean isCapaInGreeting = chooser.getConfig().getIMAPCapaInGreeting();
-                if (isPreauth)
-                    builder.append("* PREAUTH");
-                else
-                    builder.append("* OK");
-                if (isCapaInGreeting) {
-                    // TODO: DefaultServerCapabilities from Factory
-                    List<ServerCapability> capabilities = chooser.getConfig().getDefaultServerCapabilities();
-                    if (capabilities != null && !capabilities.isEmpty()) {
-                        builder.append(" [");
-                        builder.append(String.join(" ", capabilities.stream().map(x -> x.getServerCapability()).collect(Collectors.toList())));
-                        builder.append("]");
-                    }
-                }
-                builder.append(" ok\r\n");
-                break;
-            }
-            case POP3:
-            case SMTP:
-                builder.append(factory.createSendCommand(StarttlsMessageFactory.CommandType.S_CONNECTED));
-                break;
-        }
-        return builder.toString();
-    }
-
-    @Override
-    public void reset() {
-        setExecuted(null);
-    }
-
-    @Override
-    public boolean executedAsPlanned() {
-        return isExecuted();
+        super(encoding, config, StarttlsCommandType.S_CONNECTED);
     }
 
     @Override

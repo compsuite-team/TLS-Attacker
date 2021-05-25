@@ -12,6 +12,9 @@ package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.exceptions.WorkflowExecutionException;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsCommandType;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsProtocolFactory;
+import de.rub.nds.tlsattacker.core.starttls.StarttlsProtocolHandler;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.action.AsciiAction;
@@ -21,40 +24,30 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-public abstract class SendStarttlsAsciiAction extends AsciiAction {
+public class SendStarttlsAsciiAction extends StarttlsAsciiAction {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final Config config;
+    private final StarttlsCommandType commandType;
 
-    public SendStarttlsAsciiAction() {
+    public SendStarttlsAsciiAction(StarttlsCommandType commandType) {
         super();
-        config = null;
+        this.commandType = commandType;
     }
 
-    public SendStarttlsAsciiAction(Config config) {
-        super();
-        this.config = config;
+    public SendStarttlsAsciiAction(Config config, StarttlsCommandType commandType) {
+        super(config);
+        this.commandType = commandType;
     }
 
-    public SendStarttlsAsciiAction(String asciiText, String encoding, Config config) {
-        super(asciiText, encoding);
-        this.config = config;
+    public SendStarttlsAsciiAction(String asciiText, String encoding, Config config, StarttlsCommandType commandType) {
+        super(asciiText, encoding, config);
+        this.commandType = commandType;
     }
 
-    public SendStarttlsAsciiAction(String encoding, Config config) {
-        super(encoding);
-        this.config = config;
-    }
-
-    /**
-     *
-     * @return the Starttls Type
-     */
-    public StarttlsType getType() {
-        if (config == null)
-            return StarttlsType.NONE;
-        return config.getStarttlsType();
+    public SendStarttlsAsciiAction(String encoding, Config config, StarttlsCommandType commandType) {
+        super(encoding, config);
+        this.commandType = commandType;
     }
 
     @Override
@@ -76,11 +69,26 @@ public abstract class SendStarttlsAsciiAction extends AsciiAction {
         }
     }
 
-    public Config getConfig() {
-        return config;
+    @Override
+    public void reset() {
+        setExecuted(null);
     }
 
-    public abstract String initAsciiText(TlsContext tlsContext);
+    @Override
+    public boolean executedAsPlanned() {
+        return isExecuted();
+    }
 
-    public abstract String getActionInfo();
+    public StarttlsCommandType getCommandType() {
+        return commandType;
+    }
+
+    public String initAsciiText(TlsContext tlsContext) {
+        return getHandler().createCommand(tlsContext, getCommandType());
+    }
+
+    @Override
+    public String getActionInfo() {
+        return "Sending Starttls Message with type:" + getCommandType().toString();
+    }
 }

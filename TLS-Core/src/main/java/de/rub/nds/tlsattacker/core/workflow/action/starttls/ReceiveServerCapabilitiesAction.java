@@ -40,16 +40,7 @@ public class ReceiveServerCapabilitiesAction extends ReceiveStarttlsAsciiAction 
 
     @Override
     public void handleText(TlsContext tlsContext) {
-        String[] parts = getAsciiText().split(" |\\r?\\n"); // Split string on
-        // space and new
-        // Line.
-        List<ServerCapability> capabilities = new LinkedList<ServerCapability>();
-        for (String str : parts) {
-            ServerCapability capa = ServerCapability.getCapabilityFromString(getType(), str);
-            if (capa != null)
-                capabilities.add(capa);
-        }
-        tlsContext.setServerCapabilities(capabilities);
+        getHandler().handleCapabilities(tlsContext, getAsciiText());
     }
 
     @Override
