@@ -13,6 +13,7 @@ import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.AliasedConnection;
 import de.rub.nds.tlsattacker.core.constants.ServerCapability;
 import de.rub.nds.tlsattacker.core.constants.StarttlsType;
+import de.rub.nds.tlsattacker.core.exceptions.StarttlsCommandTypeNotImplementedException;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
 import de.rub.nds.tlsattacker.core.workflow.action.starttls.StarttlsActionFactory;
@@ -93,8 +94,7 @@ public class IMAPHandler implements StarttlsProtocolHandler {
                 return "* BYE\r\n" + IMAPTag + "OK done\r\n";
             case S_ERR:
                 return "* BAD command not implemented\r\n";
-            default:
-                return "";
+            default: throw new StarttlsCommandTypeNotImplementedException("CommandType \"" + commandType + "\" not implemented.");
         }
     }
 
