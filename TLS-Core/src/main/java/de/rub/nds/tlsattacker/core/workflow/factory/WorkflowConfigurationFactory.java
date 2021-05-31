@@ -92,8 +92,6 @@ public class WorkflowConfigurationFactory {
                 return createDynamicHelloWorkflow();
             case DYNAMIC_HTTPS:
                 return createHttpsDynamicWorkflow();
-            case DYNAMIC_FULL:
-                return createDynamicFullWorkflow();
         }
         throw new ConfigurationException("Unknown WorkflowTraceType " + type.name());
     }
@@ -861,27 +859,6 @@ public class WorkflowConfigurationFactory {
             }
         }
         return trace;
-    }
-
-    private WorkflowTrace createDynamicFullWorkflow() {
-        AliasedConnection connection = getConnection();
-        WorkflowTrace workflowTrace = createDynamicHandshakeWorkflow();
-
-        if (config.isServerSendsApplicationData()) {
-            workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection, ConnectionEndType.SERVER,
-                    new ApplicationMessage(config)));
-        }
-
-        if (config.isAddHeartbeatExtension()) {
-            workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection, ConnectionEndType.CLIENT,
-                    new ApplicationMessage(config), new HeartbeatMessage(config)));
-            workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection, ConnectionEndType.SERVER,
-                    new HeartbeatMessage(config)));
-        } else {
-            workflowTrace.addTlsAction(MessageActionFactory.createAction(config, connection, ConnectionEndType.CLIENT,
-                    new ApplicationMessage(config)));
-        }
-        return workflowTrace;
     }
 
     private WorkflowTrace createDynamicHelloWorkflow() {
