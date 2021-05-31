@@ -72,9 +72,8 @@ public class POP3Handler implements StarttlsProtocolHandler {
                 return "+ OK\r\n";
             case S_ERR:
                 return "-ERR\r\n";
-            default: throw new StarttlsCommandTypeNotImplementedException("CommandType \"" + commandType + "\" not implemented.");
-
         }
+        throw new StarttlsCommandTypeNotImplementedException("CommandType \"" + commandType + "\" not implemented.");
     }
 
     @Override

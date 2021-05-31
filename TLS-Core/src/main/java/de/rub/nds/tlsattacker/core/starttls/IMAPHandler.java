@@ -94,8 +94,8 @@ public class IMAPHandler implements StarttlsProtocolHandler {
                 return "* BYE\r\n" + IMAPTag + "OK done\r\n";
             case S_ERR:
                 return "* BAD command not implemented\r\n";
-            default: throw new StarttlsCommandTypeNotImplementedException("CommandType \"" + commandType + "\" not implemented.");
         }
+        throw new StarttlsCommandTypeNotImplementedException("CommandType \"" + commandType + "\" not implemented.");
     }
 
     @Override

@@ -77,9 +77,8 @@ public class SMTPHandler implements StarttlsProtocolHandler {
                 return "221 OK\r\n";
             case S_ERR:
                 return "504 command not implemented\r\n";
-            default: throw new StarttlsCommandTypeNotImplementedException("CommandType \"" + commandType + "\" not implemented.");
-
         }
+        throw new StarttlsCommandTypeNotImplementedException("CommandType \"" + commandType + "\" not implemented.");
     }
 
     @Override
