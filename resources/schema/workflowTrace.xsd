@@ -239,7 +239,7 @@
         <xs:element name="SendServerCapabilities" type="sendServerCapabilitiesAction"/>
         <xs:element name="SendServerGreeting" type="sendServerGreetingAction"/>
         <xs:element name="SendStarttlsAscii" type="sendStarttlsAsciiAction"/>
-        <xs:element name="SendStarttlsCommand" type="sendStarttlsResponseAction"/>
+        <xs:element name="SendStarttlsResponse" type="sendStarttlsResponseAction"/>
       </xs:choice>
       <xs:element name="name" type="xs:string" minOccurs="0"/>
       <xs:element name="description" type="xs:string" minOccurs="0"/>
