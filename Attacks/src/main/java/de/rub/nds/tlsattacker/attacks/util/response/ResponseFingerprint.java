@@ -1,12 +1,12 @@
 /**
  * TLS-Attacker - A Modular Penetration Testing Framework for TLS
  *
- * Copyright 2014-2020 Ruhr University Bochum, Paderborn University,
- * and Hackmanit GmbH
+ * Copyright 2014-2021 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
  *
- * Licensed under Apache License 2.0
- * http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsattacker.attacks.util.response;
 
 import de.rub.nds.modifiablevariable.util.ArrayConverter;
@@ -14,7 +14,8 @@ import de.rub.nds.tlsattacker.core.constants.AlertDescription;
 import de.rub.nds.tlsattacker.core.constants.AlertLevel;
 import de.rub.nds.tlsattacker.core.protocol.message.AlertMessage;
 import de.rub.nds.tlsattacker.core.protocol.message.FinishedMessage;
-import de.rub.nds.tlsattacker.core.protocol.message.ProtocolMessage;
+import de.rub.nds.tlsattacker.core.protocol.ProtocolMessage;
+import de.rub.nds.tlsattacker.core.protocol.message.TlsMessage;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.record.BlobRecord;
 import de.rub.nds.tlsattacker.core.record.Record;
@@ -45,7 +46,7 @@ public class ResponseFingerprint {
      * @param socketState
      */
     public ResponseFingerprint(List<ProtocolMessage> messageList, List<AbstractRecord> recordList,
-            SocketState socketState) {
+        SocketState socketState) {
         this.messageList = messageList;
         this.recordList = recordList;
         this.socketState = socketState;
@@ -91,18 +92,25 @@ public class ResponseFingerprint {
             records.append(someRecord.getClass().getSimpleName()).append(",");
         }
 
-        return "ResponseFingerprint[ Messages=[" + messages.toString() + "], Reccords=[" + records.toString()
-                + "], SocketState=" + socketState + ']';
+        return "ResponseFingerprint[ Messages=[" + messages.toString() + "], Records=[" + records.toString()
+            + "], SocketState=" + socketState + ']';
     }
 
     public String toHumanReadable() {
         StringBuilder resultString = new StringBuilder();
-        for (ProtocolMessage message : messageList) {
+        for (ProtocolMessage msg : messageList) {
+            if (!(msg instanceof TlsMessage)) {
+                resultString.append("{").append(msg.getClass().getName()).append("} ");
+                continue;
+            }
+
+            TlsMessage message = (TlsMessage) msg;
+
             switch (message.getProtocolMessageType()) {
                 case ALERT:
                     AlertMessage alert = (AlertMessage) message;
-                    AlertDescription alertDescription = AlertDescription.getAlertDescription(alert.getDescription()
-                            .getValue());
+                    AlertDescription alertDescription =
+                        AlertDescription.getAlertDescription(alert.getDescription().getValue());
                     AlertLevel alertLevel = AlertLevel.getAlertLevel(alert.getLevel().getValue());
                     if (alertDescription != null && alertLevel != null && alertLevel != AlertLevel.UNDEFINED) {
                         if (alertLevel == AlertLevel.FATAL) {
@@ -112,7 +120,7 @@ public class ResponseFingerprint {
                         }
                     } else {
                         resultString.append("{ALERT-").append(alert.getDescription().getValue()).append("-")
-                                .append(alert.getLevel()).append("}");
+                            .append(alert.getLevel()).append("}");
                     }
                     break;
                 case APPLICATION_DATA:
@@ -148,8 +156,8 @@ public class ResponseFingerprint {
                     resultString.append("B(" + ((BlobRecord) record).getCompleteRecordBytes().getValue().length + "),");
                 }
             }
-            resultString.deleteCharAt(resultString.length() - 1); // remove last
-                                                                  // commatar
+            // remove last commas
+            resultString.deleteCharAt(resultString.length() - 1);
             resultString.append("]");
         }
         resultString.append(" ");
@@ -173,6 +181,8 @@ public class ResponseFingerprint {
                 case UP:
                     resultString.append("U");
                     break;
+                default: // should never occur as all ENUM types are handled
+                    throw new UnsupportedOperationException("Unknown Socket State");
             }
         }
         return resultString.toString();
@@ -189,7 +199,7 @@ public class ResponseFingerprint {
 
     /**
      *
-     * @param obj
+     * @param  obj
      * @return
      */
     @Override
@@ -219,29 +229,29 @@ public class ResponseFingerprint {
                     if (!this.recordList.get(i).getClass().equals(other.recordList.get(i).getClass())) {
                         return false;
                     }
-                    // This also finds fragmentations issues
-                    if (this.recordList.get(i).getCompleteRecordBytes().getValue().length != other.recordList.get(i)
-                            .getCompleteRecordBytes().getValue().length) {
+                    // This also finds fragmentation issues
+                    if (this.recordList.get(i).getCompleteRecordBytes().getValue().length
+                        != other.recordList.get(i).getCompleteRecordBytes().getValue().length) {
                         return false;
                     }
                     if (this.recordList.get(i) instanceof Record && other.recordList.get(i) instanceof Record) {
                         // Comparing Records
                         Record thisRecord = (Record) this.getRecordList().get(i);
                         Record otherRecord = (Record) other.getRecordList().get(i);
-                        if (thisRecord.getContentMessageType().getValue() != otherRecord.getContentMessageType()
-                                .getValue()) {
+                        if (thisRecord.getContentMessageType().getValue()
+                            != otherRecord.getContentMessageType().getValue()) {
                             return false;
                         }
 
-                        if (!Arrays.equals(thisRecord.getProtocolVersion().getValue(), otherRecord.getProtocolVersion()
-                                .getValue())) {
+                        if (!Arrays.equals(thisRecord.getProtocolVersion().getValue(),
+                            otherRecord.getProtocolVersion().getValue())) {
                             return false;
                         }
 
                     } else {
                         // Comparing BlobRecords
-                        if (!Arrays.equals(this.getRecordList().get(i).getCompleteRecordBytes().getValue(), other
-                                .getRecordList().get(i).getCompleteRecordBytes().getValue())) {
+                        if (!Arrays.equals(this.getRecordList().get(i).getCompleteRecordBytes().getValue(),
+                            other.getRecordList().get(i).getCompleteRecordBytes().getValue())) {
                             return false;
                         }
                     }
@@ -256,7 +266,7 @@ public class ResponseFingerprint {
     /**
      * //TODO, this does not check record layer compatibility
      *
-     * @param fingerprint
+     * @param  fingerprint
      * @return
      */
     public boolean areCompatible(ResponseFingerprint fingerprint) {
@@ -289,7 +299,7 @@ public class ResponseFingerprint {
             AlertMessage alertOne = (AlertMessage) messageOne;
             AlertMessage alertTwo = (AlertMessage) messageTwo;
             if (alertOne.getDescription().getValue() != alertTwo.getDescription().getValue()
-                    || alertOne.getLevel().getValue() != alertTwo.getLevel().getValue()) {
+                || alertOne.getLevel().getValue() != alertTwo.getLevel().getValue()) {
                 return false;
             }
         }

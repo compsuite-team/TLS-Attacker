@@ -1,21 +1,20 @@
 /**
  * TLS-Attacker - A Modular Penetration Testing Framework for TLS
  *
- * Copyright 2014-2020 Ruhr University Bochum, Paderborn University,
- * and Hackmanit GmbH
+ * Copyright 2014-2021 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
  *
- * Licensed under Apache License 2.0
- * http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsattacker.core.workflow.action;
 
 import de.rub.nds.tlsattacker.core.exceptions.WorkflowExecutionException;
-import de.rub.nds.tlsattacker.core.protocol.message.ProtocolMessage;
+import de.rub.nds.tlsattacker.core.protocol.ProtocolMessage;
 import de.rub.nds.tlsattacker.core.record.AbstractRecord;
 import de.rub.nds.tlsattacker.core.state.State;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.action.executor.ActionOption;
-import de.rub.nds.tlsattacker.core.workflow.action.MessageAction.MessageActionDirection;
 import de.rub.nds.tlsattacker.core.workflow.action.executor.MessageActionResult;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,7 +57,7 @@ public class PopAndSendAction extends MessageAction implements SendingAction {
         if (index != null && index >= 0) {
             if (index >= messageBuffer.size()) {
                 throw new WorkflowExecutionException("Index out of bounds, " + "trying to get element " + index
-                        + "of message buffer with " + messageBuffer.size() + "elements.");
+                    + "of message buffer with " + messageBuffer.size() + "elements.");
             }
             messages.add(messageBuffer.get(index));
             messageBuffer.remove(index);
@@ -80,8 +79,8 @@ public class PopAndSendAction extends MessageAction implements SendingAction {
             messages = new ArrayList<>(result.getMessageList());
             records = new ArrayList<>(result.getRecordList());
             setExecuted(true);
-        } catch (IOException E) {
-            LOGGER.debug(E);
+        } catch (IOException e) {
+            LOGGER.debug(e);
             setExecuted(getActionOptions().contains(ActionOption.MAY_FAIL));
         }
     }

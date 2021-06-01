@@ -1,12 +1,12 @@
 /**
  * TLS-Attacker - A Modular Penetration Testing Framework for TLS
  *
- * Copyright 2014-2020 Ruhr University Bochum, Paderborn University,
- * and Hackmanit GmbH
+ * Copyright 2014-2021 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
  *
- * Licensed under Apache License 2.0
- * http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
@@ -43,11 +43,10 @@ public class StarttlsAnswerTillAction extends StarttlsAsciiAction {
     }
 
     /**
-     * Communicate with Client until expected command was issued. Handled
-     * Protocol messages: SMTP: EHLO, NOOP, QUIT, (STARTTLS) IMAP: CAPABILITY,
-     * NOOP, LOGOUT, (STARTTLS) POP3: CAPA, QUIT, (STARTTLS)
+     * Communicate with Client until expected command was issued. Handled Protocol messages: SMTP: EHLO, NOOP, QUIT,
+     * (STARTTLS) IMAP: CAPABILITY, NOOP, LOGOUT, (STARTTLS) POP3: CAPA, QUIT, (STARTTLS)
      * 
-     * @param state
+     * @param  state
      * @throws WorkflowExecutionException
      */
     @Override
@@ -122,6 +121,6 @@ public class StarttlsAnswerTillAction extends StarttlsAsciiAction {
     @Override
     public String getActionInfo() {
         return "StarttlsAnswerTillAction: Communicating until client issues \""
-                + getHandler().expectedCommandsDict().get(expectedMessage) + "\"";
+            + getHandler().expectedCommandsDict().get(expectedMessage) + "\"";
     }
 }

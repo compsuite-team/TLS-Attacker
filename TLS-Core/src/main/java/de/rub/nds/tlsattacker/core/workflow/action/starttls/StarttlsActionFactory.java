@@ -1,12 +1,12 @@
 /**
  * TLS-Attacker - A Modular Penetration Testing Framework for TLS
  *
- * Copyright 2014-2020 Ruhr University Bochum, Paderborn University,
- * and Hackmanit GmbH
+ * Copyright 2014-2021 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
  *
- * Licensed under Apache License 2.0
- * http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsattacker.core.workflow.action.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
@@ -25,7 +25,7 @@ public class StarttlsActionFactory {
     }
 
     public static AsciiAction createIssueStarttlsCommandAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, StarttlsCommandType commandType, String encoding) {
+        ConnectionEndType sendingConnectionEnd, StarttlsCommandType commandType, String encoding) {
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
             action = new SendStarttlsResponseAction(encoding, tlsConfig);
@@ -36,7 +36,7 @@ public class StarttlsActionFactory {
     }
 
     public static AsciiAction createStarttlsAsciiAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, StarttlsCommandType commandType, String encoding) {
+        ConnectionEndType sendingConnectionEnd, StarttlsCommandType commandType, String encoding) {
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
             action = new SendStarttlsAsciiAction(encoding, tlsConfig, commandType);
@@ -47,7 +47,7 @@ public class StarttlsActionFactory {
     }
 
     public static AsciiAction createStarttlsCommunicationAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, StarttlsCommandType commandType, String encoding) {
+        ConnectionEndType sendingConnectionEnd, StarttlsCommandType commandType, String encoding) {
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
             action = new SendStarttlsAsciiAction(tlsConfig, commandType);
@@ -58,7 +58,7 @@ public class StarttlsActionFactory {
     }
 
     public static AsciiAction createServerCapabilitiesAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, String encoding) {
+        ConnectionEndType sendingConnectionEnd, String encoding) {
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd)
             action = new SendServerCapabilitiesAction(encoding, tlsConfig);
@@ -68,7 +68,7 @@ public class StarttlsActionFactory {
     }
 
     public static AsciiAction createServerGreetingAction(Config tlsConfig, AliasedConnection connection,
-            ConnectionEndType sendingConnectionEnd, String encoding) {
+        ConnectionEndType sendingConnectionEnd, String encoding) {
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd)
             action = new SendServerGreetingAction(encoding, tlsConfig);

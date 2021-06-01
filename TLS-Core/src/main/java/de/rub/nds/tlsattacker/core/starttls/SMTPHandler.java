@@ -1,12 +1,12 @@
 /**
  * TLS-Attacker - A Modular Penetration Testing Framework for TLS
  *
- * Copyright 2014-2020 Ruhr University Bochum, Paderborn University,
- * and Hackmanit GmbH
+ * Copyright 2014-2021 Ruhr University Bochum, Paderborn University, Hackmanit GmbH
  *
- * Licensed under Apache License 2.0
- * http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  */
+
 package de.rub.nds.tlsattacker.core.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
@@ -102,16 +102,21 @@ public class SMTPHandler implements StarttlsProtocolHandler {
 
     @Override
     public WorkflowTrace extendWorkflowTrace(AliasedConnection connection, Config config, WorkflowTrace workflowTrace) {
-        workflowTrace.addTlsAction(StarttlsActionFactory.createServerGreetingAction(config, connection,
-                ConnectionEndType.SERVER, "US-ASCII"));
+        workflowTrace.addTlsAction(
+            StarttlsActionFactory.createServerGreetingAction(config, connection, ConnectionEndType.SERVER, "US-ASCII"));
         workflowTrace.addTlsAction(StarttlsActionFactory.createStarttlsCommunicationAction(config, connection,
-                ConnectionEndType.CLIENT, StarttlsCommandType.C_CAPA, "US-ASCII"));
+            ConnectionEndType.CLIENT, StarttlsCommandType.C_CAPA, "US-ASCII"));
         workflowTrace.addTlsAction(StarttlsActionFactory.createServerCapabilitiesAction(config, connection,
-                ConnectionEndType.SERVER, "US-ASCII"));
+            ConnectionEndType.SERVER, "US-ASCII"));
         workflowTrace.addTlsAction(StarttlsActionFactory.createStarttlsCommunicationAction(config, connection,
-                ConnectionEndType.CLIENT, StarttlsCommandType.C_STARTTLS, "US-ASCII"));
+            ConnectionEndType.CLIENT, StarttlsCommandType.C_STARTTLS, "US-ASCII"));
         workflowTrace.addTlsAction(StarttlsActionFactory.createIssueStarttlsCommandAction(config, connection,
-                ConnectionEndType.SERVER, StarttlsCommandType.S_STARTTLS, "US-ASCII"));
+            ConnectionEndType.SERVER, StarttlsCommandType.S_STARTTLS, "US-ASCII"));
         return workflowTrace;
+    }
+
+    @Override
+    public String getNegotiationString() {
+        return "220";
     }
 }
