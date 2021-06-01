@@ -55,7 +55,6 @@ public abstract class ReceiveStarttlsAsciiAction extends StarttlsAsciiAction {
             String receivedText = new String(fetchData, getEncoding());
             setAsciiText(receivedText);
             LOGGER.info("Received: " + getAsciiText());
-            setAsciiText(getAsciiText());
 
             handleText(tlsContext);
 

@@ -50,7 +50,7 @@ public class StarttlsActionFactory {
         ConnectionEndType sendingConnectionEnd, StarttlsCommandType commandType, String encoding) {
         AsciiAction action;
         if (connection.getLocalConnectionEndType() == sendingConnectionEnd) {
-            action = new SendStarttlsAsciiAction(tlsConfig, commandType);
+            action = new SendStarttlsAsciiAction(encoding, tlsConfig, commandType);
         } else {
             action = new StarttlsAnswerTillAction(tlsConfig, commandType, encoding);
         }

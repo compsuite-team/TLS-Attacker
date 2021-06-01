@@ -30,6 +30,11 @@ public class SendStarttlsAsciiAction extends StarttlsAsciiAction {
 
     private final StarttlsCommandType commandType;
 
+    public SendStarttlsAsciiAction() {
+        super();
+        this.commandType = null;
+    }
+
     public SendStarttlsAsciiAction(StarttlsCommandType commandType) {
         super();
         this.commandType = commandType;
@@ -89,6 +94,6 @@ public class SendStarttlsAsciiAction extends StarttlsAsciiAction {
 
     @Override
     public String getActionInfo() {
-        return "Sending Starttls Message with type:" + getCommandType().toString();
+        return "Sending Starttls Message with type " + getCommandType().toString() + ": ";
     }
 }

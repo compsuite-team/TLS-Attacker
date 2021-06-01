@@ -27,8 +27,10 @@ public class IMAPHandler implements StarttlsProtocolHandler {
     @Override
     public void handleServerGreeting(TlsContext tlsContext, String str) {
         String[] parts = str.split(" ");
-        if ("PREAUTH".equals(parts[1]))
-            tlsContext.setIsPreauth(true);
+        if (parts.length >= 2) {
+            if ("PREAUTH".equals(parts[1]))
+                tlsContext.setIsPreauth(true);
+        }
         if (parts.length >= 2 && parts[2] != null && parts[2].startsWith("[")) {
             tlsContext.setCapaInGreeting(true);
             List<ServerCapability> capabilities = new LinkedList<ServerCapability>();
