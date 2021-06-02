@@ -11,8 +11,6 @@ package de.rub.nds.tlsattacker.core.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.AliasedConnection;
-import de.rub.nds.tlsattacker.core.constants.ServerCapability;
-import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.exceptions.StarttlsCommandTypeNotImplementedException;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
@@ -24,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class SMTPHandler implements StarttlsProtocolHandler {
+public class SMTPHandler extends StarttlsProtocolHandler {
     @Override
     public void handleServerGreeting(TlsContext tlsContext, String str) {
 
@@ -32,14 +30,15 @@ public class SMTPHandler implements StarttlsProtocolHandler {
 
     @Override
     public void handleCapabilities(TlsContext tlsContext, String str) {
-        String[] parts = str.split(" |\\r?\\n"); // Split string on
-        // space and new
-        // Line.
+        // Split string on space and new line
+        String[] parts = str.split(" |\\r?\\n");
         List<ServerCapability> capabilities = new LinkedList<ServerCapability>();
         for (String s : parts) {
-            ServerCapability capa = ServerCapability.getCapabilityFromString(StarttlsType.SMTP, s);
+            ServerCapability capa = getCapabilityFromString(s);
             if (capa != null)
                 capabilities.add(capa);
+            else
+                capabilities.add(new ServerCapability(s));
         }
         tlsContext.setServerCapabilities(capabilities);
     }
@@ -58,9 +57,9 @@ public class SMTPHandler implements StarttlsProtocolHandler {
                 builder.append("250-mail.example.org\r\n");
                 if (!capabilities.isEmpty()) {
                     for (int i = 0; i < capabilities.size() - 1; i++) {
-                        builder.append("250-" + capabilities.get(i).getServerCapability() + "\r\n");
+                        builder.append("250-" + capabilities.get(i).getName() + "\r\n");
                     }
-                    builder.append("250 " + capabilities.get(capabilities.size() - 1).getServerCapability() + "\r\n");
+                    builder.append("250 " + capabilities.get(capabilities.size() - 1).getName() + "\r\n");
                 }
                 return builder.toString();
             case C_STARTTLS:
@@ -116,7 +115,29 @@ public class SMTPHandler implements StarttlsProtocolHandler {
     }
 
     @Override
+    public boolean offersPlainLogin(String serverCapability) {
+        ServerCapability capability = getCapabilityFromString(serverCapability);
+        if (capability != null)
+            return capability.isPlain();
+        else if (serverCapability.startsWith("250-AUTH")) {
+            if (serverCapability.contains("PLAIN") || serverCapability.contains("LOGIN"))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
     public String getNegotiationString() {
         return "220";
+    }
+
+    @Override
+    public List<ServerCapability> getImplementedCapabilities() {
+        List<ServerCapability> list = new LinkedList<>();
+        list.add(new de.rub.nds.tlsattacker.core.starttls.ServerCapability("AUTH=PLAIN", true, false, false));
+        list.add(new de.rub.nds.tlsattacker.core.starttls.ServerCapability("AUTH=LOGIN", true, false, false));
+        list.add(new de.rub.nds.tlsattacker.core.starttls.ServerCapability("8BITMIME"));
+        list.add(new de.rub.nds.tlsattacker.core.starttls.ServerCapability("STARTTLS", false, false, true));
+        return list;
     }
 }

@@ -11,8 +11,7 @@ package de.rub.nds.tlsattacker.core.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.AliasedConnection;
-import de.rub.nds.tlsattacker.core.constants.ServerCapability;
-import de.rub.nds.tlsattacker.core.constants.StarttlsType;
+
 import de.rub.nds.tlsattacker.core.exceptions.StarttlsCommandTypeNotImplementedException;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
@@ -20,9 +19,8 @@ import de.rub.nds.tlsattacker.core.workflow.action.starttls.StarttlsActionFactor
 import de.rub.nds.tlsattacker.transport.ConnectionEndType;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class IMAPHandler implements StarttlsProtocolHandler {
+public class IMAPHandler extends StarttlsProtocolHandler {
 
     @Override
     public void handleServerGreeting(TlsContext tlsContext, String str) {
@@ -40,9 +38,11 @@ public class IMAPHandler implements StarttlsProtocolHandler {
                     capability = capability.substring(1);
                 if (capability.endsWith("]"))
                     capability = capability.substring(0, capability.length() - 1);
-                ServerCapability capa = ServerCapability.getCapabilityFromString(StarttlsType.IMAP, capability);
+                ServerCapability capa = getCapabilityFromString(capability);
                 if (capa != null)
                     capabilities.add(capa);
+                else
+                    capabilities.add(new ServerCapability(capability));
             }
             tlsContext.setServerCapabilities(capabilities);
         }
@@ -50,14 +50,15 @@ public class IMAPHandler implements StarttlsProtocolHandler {
 
     @Override
     public void handleCapabilities(TlsContext tlsContext, String str) {
-        String[] parts = str.split(" |\\r?\\n"); // Split string on
-        // space and new
-        // Line.
-        List<ServerCapability> capabilities = new LinkedList<ServerCapability>();
+        // Split string on space and new line
+        String[] parts = str.split(" |\\r?\\n");
+        List<ServerCapability> capabilities = new LinkedList<>();
         for (String s : parts) {
-            ServerCapability capa = ServerCapability.getCapabilityFromString(StarttlsType.IMAP, s);
+            ServerCapability capa = getCapabilityFromString(s);
             if (capa != null)
                 capabilities.add(capa);
+            else
+                capabilities.add(new ServerCapability(s));
         }
         tlsContext.setServerCapabilities(capabilities);
     }
@@ -70,8 +71,8 @@ public class IMAPHandler implements StarttlsProtocolHandler {
             IMAPTag = IMAPTag + " ";
         StringBuilder builder = new StringBuilder();
         for (ServerCapability capa : config.getDefaultServerCapabilities()) {
-            if (!(commandType == StarttlsCommandType.S_CAPA && capa == ServerCapability.IMAP_CAPABILITY))
-                builder.append(" " + capa.getServerCapability());
+            if (!(commandType == StarttlsCommandType.S_CAPA && capa.getName().equals("CAPABILITY")))
+                builder.append(" " + capa.getName());
         }
         switch (commandType) {
             case S_CONNECTED:
@@ -132,5 +133,17 @@ public class IMAPHandler implements StarttlsProtocolHandler {
     @Override
     public String getNegotiationString() {
         return "negotiation";
+    }
+
+    @Override
+    public List<de.rub.nds.tlsattacker.core.starttls.ServerCapability> getImplementedCapabilities() {
+        List<ServerCapability> list = new LinkedList<>();
+        list.add(new ServerCapability("CAPABILITY"));
+        list.add(new ServerCapability("IMAP4REV1"));
+        list.add(new ServerCapability("AUTH=PLAIN", true, false, false));
+        list.add(new ServerCapability("AUTH=LOGIN", true, false, false));
+        list.add(new ServerCapability("LOGINDISABLED", false, true, false));
+        list.add(new ServerCapability("STARTTLS", false, false, true));
+        return list;
     }
 }

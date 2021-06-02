@@ -11,8 +11,6 @@ package de.rub.nds.tlsattacker.core.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.AliasedConnection;
-import de.rub.nds.tlsattacker.core.constants.ServerCapability;
-import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.exceptions.StarttlsCommandTypeNotImplementedException;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
@@ -24,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class POP3Handler implements StarttlsProtocolHandler {
+public class POP3Handler extends StarttlsProtocolHandler {
 
     @Override
     public void handleServerGreeting(TlsContext tlsContext, String str) {
@@ -33,14 +31,15 @@ public class POP3Handler implements StarttlsProtocolHandler {
 
     @Override
     public void handleCapabilities(TlsContext tlsContext, String str) {
-        String[] parts = str.split(" |\\r?\\n"); // Split string on
-        // space and new
-        // Line.
+        // Split string on space and new line
+        String[] parts = str.split(" |\\r?\\n");
         List<ServerCapability> capabilities = new LinkedList<ServerCapability>();
         for (String s : parts) {
-            ServerCapability capa = ServerCapability.getCapabilityFromString(StarttlsType.POP3, s);
+            ServerCapability capa = getCapabilityFromString(s);
             if (capa != null)
                 capabilities.add(capa);
+            else
+                capabilities.add(new ServerCapability(s));
         }
         tlsContext.setServerCapabilities(capabilities);
     }
@@ -57,7 +56,7 @@ public class POP3Handler implements StarttlsProtocolHandler {
                 StringBuilder builder = new StringBuilder();
                 builder.append("+OK");
                 for (ServerCapability capa : config.getDefaultServerCapabilities()) {
-                    builder.append("\r\n" + capa.getServerCapability());
+                    builder.append("\r\n" + capa.getName());
                 }
                 builder.append("\r\n.\r\n");
                 return builder.toString();
@@ -82,7 +81,6 @@ public class POP3Handler implements StarttlsProtocolHandler {
         dict.put(StarttlsCommandType.C_STARTTLS, "STLS");
         dict.put(StarttlsCommandType.C_CAPA, "CAPA");
         dict.put(StarttlsCommandType.C_QUIT, "QUIT");
-        // dict.put(StarttlsCommandType.C_NOOP, "AUTH");
         return dict;
     }
 
@@ -107,7 +105,31 @@ public class POP3Handler implements StarttlsProtocolHandler {
     }
 
     @Override
+    public boolean offersPlainLogin(String serverCapability) {
+        ServerCapability capability = getCapabilityFromString(serverCapability);
+        if (capability != null)
+            return capability.isPlain();
+        else if (serverCapability.startsWith("SASL") || serverCapability.startsWith("AUTH")) {
+            if (serverCapability.contains("PLAIN") || serverCapability.contains("LOGIN"))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
     public String getNegotiationString() {
         return "+OK";
+    }
+
+    @Override
+    public List<ServerCapability> getImplementedCapabilities() {
+        List<ServerCapability> list = new LinkedList<>();
+        list.add(new ServerCapability("USER", true, false, false));
+        list.add(new ServerCapability("SASL PLAIN LOGIN", true, false, false));
+        list.add(new ServerCapability("CAPA"));
+        list.add(new ServerCapability("STLS", false, false, true));
+        list.add(new ServerCapability("UIDL"));
+        list.add(new ServerCapability("PIPELINING"));
+        return list;
     }
 }

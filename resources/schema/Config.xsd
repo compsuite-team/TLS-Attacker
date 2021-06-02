@@ -1249,6 +1249,10 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="serverCapability">
+    <xs:sequence/>
+  </xs:complexType>
+
   <xs:simpleType name="certificateKeyType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="DH"/>
@@ -2252,27 +2256,6 @@
       <xs:enumeration value="GREASE_14"/>
       <xs:enumeration value="GREASE_15"/>
       <xs:enumeration value="UNKNOWN"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="serverCapability">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="IMAP_CAPABILITY"/>
-      <xs:enumeration value="IMAP_IMAP4rev1"/>
-      <xs:enumeration value="IMAP_AUTHPLAIN"/>
-      <xs:enumeration value="IMAP_AUTHLOGIN"/>
-      <xs:enumeration value="IMAP_LOGINDISABLED"/>
-      <xs:enumeration value="IMAP_STARTTLS"/>
-      <xs:enumeration value="POP3_USERPLAIN"/>
-      <xs:enumeration value="POP3_SASLPLAINLOGIN"/>
-      <xs:enumeration value="POP3_CAPA"/>
-      <xs:enumeration value="POP3_UIDL"/>
-      <xs:enumeration value="POP3_PIPELINING"/>
-      <xs:enumeration value="POP3_STLS"/>
-      <xs:enumeration value="SMTP_AUTHPLAIN"/>
-      <xs:enumeration value="SMTP_AUTHLOGIN"/>
-      <xs:enumeration value="SMTP_STARTTLS"/>
-      <xs:enumeration value="SMTP_8BITMIME"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

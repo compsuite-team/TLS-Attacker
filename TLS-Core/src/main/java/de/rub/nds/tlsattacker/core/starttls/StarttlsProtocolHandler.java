@@ -11,28 +11,62 @@ package de.rub.nds.tlsattacker.core.starttls;
 
 import de.rub.nds.tlsattacker.core.config.Config;
 import de.rub.nds.tlsattacker.core.connection.AliasedConnection;
-import de.rub.nds.tlsattacker.core.constants.ServerCapability;
+import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
+import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
-public interface StarttlsProtocolHandler {
+public abstract class StarttlsProtocolHandler {
 
-    public void handleServerGreeting(TlsContext tlsContext, String str);
+    protected final String capabilityPrefix;
 
-    public void handleCapabilities(TlsContext tlsContext, String str);
+    public StarttlsProtocolHandler() {
+        this("");
+    }
 
-    public String createCommand(TlsContext tlsContext, StarttlsCommandType commandType);
+    public StarttlsProtocolHandler(String prefix) {
+        this.capabilityPrefix = prefix;
+    }
 
-    public Map<StarttlsCommandType, String> expectedCommandsDict();
+    public abstract void handleServerGreeting(TlsContext tlsContext, String str);
 
-    public Map<StarttlsCommandType, StarttlsCommandType> CommandsResponses();
+    public abstract void handleCapabilities(TlsContext tlsContext, String str);
 
-    public WorkflowTrace extendWorkflowTrace(AliasedConnection connection, Config config, WorkflowTrace workflowTrace);
+    public abstract String createCommand(TlsContext tlsContext, StarttlsCommandType commandType);
 
-    public String getNegotiationString();
+    public abstract Map<StarttlsCommandType, String> expectedCommandsDict();
 
+    public abstract Map<StarttlsCommandType, StarttlsCommandType> CommandsResponses();
+
+    public abstract WorkflowTrace extendWorkflowTrace(AliasedConnection connection, Config config,
+        WorkflowTrace workflowTrace);
+
+    public abstract String getNegotiationString();
+
+    public abstract List<ServerCapability> getImplementedCapabilities();
+
+    public boolean offersPlainLogin(String serverCapability) {
+        ServerCapability capability = getCapabilityFromString(serverCapability);
+        if (capability != null)
+            return capability.isPlain();
+        return false;
+    }
+
+    public String getCapabilityPrefix() {
+        return this.capabilityPrefix;
+    }
+
+    public ServerCapability getCapabilityFromString(String str) {
+        String comparison = str;
+        for (ServerCapability capability : getImplementedCapabilities()) {
+            comparison = comparison.substring(getCapabilityPrefix().length());
+            if (capability.getName().equalsIgnoreCase(comparison))
+                return capability;
+        }
+        return null;
+    }
 }
