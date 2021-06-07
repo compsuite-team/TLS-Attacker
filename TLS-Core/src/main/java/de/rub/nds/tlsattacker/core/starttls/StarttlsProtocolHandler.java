@@ -14,6 +14,8 @@ import de.rub.nds.tlsattacker.core.connection.AliasedConnection;
 import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.state.TlsContext;
 import de.rub.nds.tlsattacker.core.workflow.WorkflowTrace;
+import de.rub.nds.tlsattacker.core.workflow.action.starttls.StarttlsActionFactory;
+import de.rub.nds.tlsattacker.transport.ConnectionEndType;
 import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.Dictionary;
@@ -42,8 +44,15 @@ public abstract class StarttlsProtocolHandler {
 
     public abstract Map<StarttlsCommandType, StarttlsCommandType> CommandsResponses();
 
-    public abstract WorkflowTrace extendWorkflowTrace(AliasedConnection connection, Config config,
-        WorkflowTrace workflowTrace);
+    public WorkflowTrace extendWorkflowTrace(AliasedConnection connection, Config config, WorkflowTrace workflowTrace) {
+        workflowTrace.addTlsAction(
+            StarttlsActionFactory.createServerGreetingAction(config, connection, ConnectionEndType.SERVER, "US-ASCII"));
+        workflowTrace.addTlsAction(StarttlsActionFactory.createStarttlsCommunicationAction(config, connection,
+            ConnectionEndType.CLIENT, StarttlsCommandType.C_STARTTLS, "US-ASCII"));
+        workflowTrace.addTlsAction(StarttlsActionFactory.createIssueStarttlsCommandAction(config, connection,
+            ConnectionEndType.SERVER, StarttlsCommandType.S_STARTTLS, "US-ASCII"));
+        return workflowTrace;
+    }
 
     public abstract String getNegotiationString();
 

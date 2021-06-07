@@ -94,17 +94,6 @@ public class POP3Handler extends StarttlsProtocolHandler {
     }
 
     @Override
-    public WorkflowTrace extendWorkflowTrace(AliasedConnection connection, Config config, WorkflowTrace workflowTrace) {
-        workflowTrace.addTlsAction(
-            StarttlsActionFactory.createServerGreetingAction(config, connection, ConnectionEndType.SERVER, "US-ASCII"));
-        workflowTrace.addTlsAction(StarttlsActionFactory.createStarttlsCommunicationAction(config, connection,
-            ConnectionEndType.CLIENT, StarttlsCommandType.C_STARTTLS, "US-ASCII"));
-        workflowTrace.addTlsAction(StarttlsActionFactory.createIssueStarttlsCommandAction(config, connection,
-            ConnectionEndType.SERVER, StarttlsCommandType.S_STARTTLS, "US-ASCII"));
-        return workflowTrace;
-    }
-
-    @Override
     public boolean offersPlainLogin(String serverCapability) {
         ServerCapability capability = getCapabilityFromString(serverCapability);
         if (capability != null)
