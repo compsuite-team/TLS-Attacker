@@ -16,6 +16,8 @@ import de.rub.nds.tlsattacker.core.state.TlsContext;
 public class StarttlsProtocolFactory {
     public static StarttlsProtocolHandler getProtocol(StarttlsType type) {
         switch (type) {
+            case FTP:
+                return new FTPHandler();
             case IMAP:
                 return new IMAPHandler();
             case POP3:
